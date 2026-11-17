@@ -1,0 +1,212 @@
+# ==============================================================================
+# PRUEBAS DE COMUNICACIÓN API REST - SISTEMA PASAYA
+# Extensión recomendada: REST Client para VS Code
+# Base URL simulada: http://localhost:3000
+# ==============================================================================
+
+@baseUrl = http://localhost:3000
+@authToken = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.simulado
+
+### 1. AUTENTICACIÓN Y USUARIOS
+# Listar usuarios del sistema
+GET {{baseUrl}}/usuarios
+Authorization: {{authToken}}
+
+### Obtener usuario específico
+GET {{baseUrl}}/usuarios/usr-1
+Authorization: {{authToken}}
+
+### 2. PROCESO 1: PASAJEROS Y TARJETAS
+# Listar todos los pasajeros
+GET {{baseUrl}}/pasajeros
+
+### Buscar pasajero por documento
+GET {{baseUrl}}/pasajeros?numero_documento=72345678
+
+### Registrar nuevo pasajero
+POST {{baseUrl}}/pasajeros
+Content-Type: application/json
+Authorization: {{authToken}}
+
+{
+  "tipo_documento": "DNI",
+  "numero_documento": "79887766",
+  "nombres": "Camila",
+  "apellidos": "Salas Bravo",
+  "telefono": "987998877",
+  "email": "camila.salas@gmail.com",
+  "tipo_tarifa": "general",
+  "estado": "activo"
+}
+
+### Listar tarjetas activas
+GET {{baseUrl}}/tarjetas?estado=activa
+
+### Buscar tarjeta por código
+GET {{baseUrl}}/tarjetas?codigo_tarjeta=TARJ-1001
+
+### 3. PROCESO 2: RECARGA DE SALDO
+# Listar puntos de recarga autorizados
+GET {{baseUrl}}/puntos-recarga
+
+### Registrar recarga de saldo (Ejemplo: abonar S/ 20.00)
+POST {{baseUrl}}/recargas
+Content-Type: application/json
+Authorization: {{authToken}}
+
+{
+  "tarjeta_id": "tar-1",
+  "punto_recarga_id": "pto-1",
+  "usuario_id": "usr-3",
+  "monto": 20.00,
+  "saldo_anterior": 15.00,
+  "saldo_posterior": 35.00,
+  "fecha_hora": "2026-11-10T12:00:00Z"
+}
+
+### Actualizar el saldo de la tarjeta recargada
+PATCH {{baseUrl}}/tarjetas/tar-1
+Content-Type: application/json
+Authorization: {{authToken}}
+
+{
+  "saldo": 35.00
+}
+
+### 4. PROCESO 3: EMPRESAS Y UNIDADES DE TRANSPORTE
+# Listar empresas concesionarias
+GET {{baseUrl}}/empresas
+
+### Listar unidades de transporte (buses operativos)
+GET {{baseUrl}}/unidades?estado=operativo
+
+### Registrar nueva unidad
+POST {{baseUrl}}/unidades
+Content-Type: application/json
+Authorization: {{authToken}}
+
+{
+  "empresa_id": "emp-1",
+  "conductor_id": "con-1",
+  "placa": "F8X-900",
+  "padron": "BUS-03",
+  "capacidad_pasajeros": 50,
+  "estado": "operativo"
+}
+
+### 5. PROCESO 4: RUTAS Y TARIFAS
+# Listar rutas activas
+GET {{baseUrl}}/rutas
+
+### Consultar tarifas vigentes de la Línea Roja (rut-1)
+GET {{baseUrl}}/tarifas?ruta_id=rut-1&estado=vigente
+
+### 6. PROCESO 5: REGISTRO DE VIAJES (SIMULACIÓN DE ABORDAJE)
+# Registrar cobro exitoso al abordar la unidad
+POST {{baseUrl}}/viajes
+Content-Type: application/json
+Authorization: {{authToken}}
+
+{
+  "tarjeta_id": "tar-1",
+  "codigo_tarjeta": "TARJ-1001",
+  "unidad_id": "und-1",
+  "ruta_id": "rut-1",
+  "tarifa_monto": 2.50,
+  "saldo_anterior": 35.00,
+  "saldo_posterior": 32.50,
+  "fecha_hora": "2026-11-10T12:05:00Z",
+  "estado": "exitoso"
+}
+
+### Débito en la tarjeta tras el cobro del viaje
+PATCH {{baseUrl}}/tarjetas/tar-1
+Content-Type: application/json
+Authorization: {{authToken}}
+
+{
+  "saldo": 32.50
+}
+
+### Listar viajes registrados en la jornada
+GET {{baseUrl}}/viajes?unidad_id=und-1
+
+### 7. PROCESO 6: CONTROL Y CIERRE DE RECAUDACIÓN
+# Consultar recaudación consolidada
+GET {{baseUrl}}/recaudaciones?fecha=2026-10-25
+
+### Registrar cierre diario de recaudación
+POST {{baseUrl}}/recaudaciones
+Content-Type: application/json
+Authorization: {{authToken}}
+
+{
+  "unidad_id": "und-1",
+  "ruta_id": "rut-1",
+  "fecha": "2026-11-10",
+  "total_viajes": 190,
+  "monto_total": 435.00,
+  "estado": "cerrado",
+  "fecha_cierre": "2026-11-10T23:30:00Z"
+}
+
+### 8. PROCESO 7: BLOQUEO Y REPOSICIÓN DE TARJETA
+# Paso 1: Bloquear tarjeta extraviada
+PATCH {{baseUrl}}/tarjetas/tar-6
+Content-Type: application/json
+Authorization: {{authToken}}
+
+{
+  "estado": "bloqueada"
+}
+
+### Paso 2: Registrar reposición y traspaso de saldo a nuevo plástico
+POST {{baseUrl}}/reposiciones
+Content-Type: application/json
+Authorization: {{authToken}}
+
+{
+  "tarjeta_origen_id": "tar-6",
+  "tarjeta_destino_id": "tar-7",
+  "motivo": "perdida",
+  "saldo_transferido": 5.00,
+  "fecha_hora": "2026-11-10T12:20:00Z",
+  "usuario_id": "usr-1"
+}
+
+### 9. PROCESO 8: LIQUIDACIÓN A EMPRESAS
+# Consultar liquidaciones emitidas
+GET {{baseUrl}}/liquidaciones
+
+### Emitir liquidación semanal para empresa concesionaria
+POST {{baseUrl}}/liquidaciones
+Content-Type: application/json
+Authorization: {{authToken}}
+
+{
+  "empresa_id": "emp-1",
+  "periodo_inicio": "2026-11-01",
+  "periodo_fin": "2026-11-07",
+  "total_viajes": 2600,
+  "monto_bruto": 6000.00,
+  "porcentaje_comision": 5.00,
+  "monto_comision": 300.00,
+  "monto_neto": 5700.00,
+  "estado": "calculada",
+  "fecha_liquidacion": "2026-11-08T10:00:00Z",
+  "usuario_id": "usr-1"
+}
+
+### Marcar liquidación como pagada
+PATCH {{baseUrl}}/liquidaciones/liq-3
+Content-Type: application/json
+Authorization: {{authToken}}
+
+{
+  "estado": "pagada"
+}
+
+### 10. AUDITORÍA DEL SISTEMA
+# Consultar bitácora de eventos
+GET {{baseUrl}}/auditoria
+Authorization: {{authToken}}

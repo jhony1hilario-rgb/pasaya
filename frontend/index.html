@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PasaYa - Sistema de Pago Electrónico y Transporte Urbano</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .badge-active { background-color: #d1fae5; color: #065f46; }
+    .badge-danger { background-color: #fee2e2; color: #991b1b; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased flex min-h-screen">
+
+  <!-- Sidebar -->
+  <aside class="w-64 bg-slate-900 text-slate-200 flex flex-col shrink-0 shadow-lg">
+    <div class="p-6 border-b border-slate-800 flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold text-xl shadow">
+        P
+      </div>
+      <div>
+        <h1 class="font-bold text-lg text-white leading-tight">PasaYa</h1>
+        <p class="text-xs text-emerald-400 font-medium">Transporte Electrónico</p>
+      </div>
+    </div>
+
+    <!-- Perfil Simulado / Rol -->
+    <div class="p-4 bg-slate-800/60 m-3 rounded-lg border border-slate-700/60">
+      <div class="text-xs text-slate-400 font-semibold uppercase mb-1">Rol activo (Simulación):</div>
+      <select id="userSelector" class="w-full text-xs bg-slate-900 text-white border border-slate-700 rounded p-1.5 focus:outline-none focus:border-emerald-500">
+        <option value="usr-1">Andrea Mendoza (Administrador)</option>
+        <option value="usr-2" selected>Carlos Ramos (Operador)</option>
+        <option value="usr-3">Lucía Fernández (Cajero)</option>
+      </select>
+    </div>
+
+    <!-- Menú de Navegación -->
+    <nav class="flex-1 px-3 py-2 space-y-1 overflow-y-auto text-sm" id="navMenu">
+      <button onclick="navigate('dashboard')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-emerald-400 bg-slate-800 font-medium transition">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+      </button>
+      <button onclick="navigate('abordaje')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+        <i data-lucide="bus" class="w-4 h-4"></i> P5: Abordaje (Cobro)
+      </button>
+      <button onclick="navigate('recargas')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+        <i data-lucide="wallet" class="w-4 h-4"></i> P2: Recarga de Saldo
+      </button>
+      <button onclick="navigate('pasajeros')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+        <i data-lucide="credit-card" class="w-4 h-4"></i> P1: Pasajeros y Tarjetas
+      </button>
+      <button onclick="navigate('recaudacion')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+        <i data-lucide="bar-chart-3" class="w-4 h-4"></i> P6: Recaudación Diaria
+      </button>
+      <button onclick="navigate('reposicion')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+        <i data-lucide="shield-alert" class="w-4 h-4"></i> P7: Bloqueo y Reposición
+      </button>
+      <button onclick="navigate('liquidaciones')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+        <i data-lucide="landmark" class="w-4 h-4"></i> P8: Liquidaciones
+      </button>
+      <button onclick="navigate('flota')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+        <i data-lucide="truck" class="w-4 h-4"></i> P3 y P4: Flota y Rutas
+      </button>
+      <button onclick="navigate('auditoria')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+        <i data-lucide="history" class="w-4 h-4"></i> Bitácora Auditoría
+      </button>
+    </nav>
+
+    <!-- Footer info -->
+    <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
+      TECSUP - Laboratorio 13<br>
+      API Mock: <span class="text-emerald-400 font-mono" id="apiStatus">localhost:3000</span>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex flex-col overflow-hidden">
+    <!-- Topbar -->
+    <header class="h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-between shrink-0">
+      <div class="flex items-center gap-4">
+        <h2 id="viewTitle" class="text-xl font-bold text-slate-800">Dashboard General</h2>
+        <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">API Conectada</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-sm text-slate-600 font-medium" id="userNameLabel">Carlos Ramos Valencia (Operador)</span>
+        <button onclick="simulateReload()" class="p-2 rounded-lg hover:bg-slate-100 text-slate-600 transition" title="Refrescar datos">
+          <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <div class="flex-1 overflow-y-auto p-8" id="viewContainer">
+      <!-- Dynamic Views Loaded Here -->
+    </div>
+
+    <!-- Feedback Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 hidden max-w-md p-4 rounded-xl shadow-2xl flex items-start gap-3 transition-all z-50"></div>
+  </main>
+
+  <!-- Modal Interactivo: Registrar Nuevo Pasajero (P1) -->
+  <div id="modalNuevoPasajero" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full border border-slate-100 overflow-hidden" onclick="event.stopPropagation()">
+      <!-- Modal Header -->
+      <div class="bg-slate-900 text-white p-5 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white">
+            <i data-lucide="user-plus" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base text-white">Registrar Nuevo Pasajero</h3>
+            <p class="text-xs text-slate-400">P1: Emisión de usuario y vinculación de tarjeta prepago</p>
+          </div>
+        </div>
+        <button type="button" onclick="cerrarModalPasajero()" class="text-slate-400 hover:text-white p-1 rounded-lg transition" title="Cerrar">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body / Formulario -->
+      <form id="formNuevoPasajero" class="p-6 space-y-4">
+        <!-- DNI -->
+        <div>
+          <label for="txtNuevoDni" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+            Número de DNI <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <i data-lucide="id-card" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
+            <input type="text" id="txtNuevoDni" placeholder="Ej. 74859612" maxlength="8" pattern="[0-9]{8}" required
+              class="w-full text-sm border border-slate-300 rounded-lg pl-9 pr-3 py-2.5 font-mono focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none">
+          </div>
+          <p class="text-[11px] text-slate-400 mt-1">Debe contener exactamente 8 dígitos numéricos.</p>
+        </div>
+
+        <!-- Nombres y Apellidos -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="txtNuevoNombres" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+              Nombres <span class="text-red-500">*</span>
+            </label>
+            <input type="text" id="txtNuevoNombres" placeholder="Ej. Gabriela Sofía" required
+              class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2.5 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none">
+          </div>
+          <div>
+            <label for="txtNuevoApellidos" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+              Apellidos <span class="text-red-500">*</span>
+            </label>
+            <input type="text" id="txtNuevoApellidos" placeholder="Ej. Paredes Mendoza" required
+              class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2.5 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none">
+          </div>
+        </div>
+
+        <!-- Tipo de Tarifa -->
+        <div>
+          <label for="selNuevoTipoTarifa" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+            Tipo de Tarifa <span class="text-red-500">*</span>
+          </label>
+          <select id="selNuevoTipoTarifa" required
+            class="w-full text-sm border border-slate-300 rounded-lg p-2.5 bg-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none">
+            <option value="general" selected>General (Tarifa estándar SIT S/ 1.50)</option>
+            <option value="estudiante">Estudiante / Universitario (Tarifa preferencial S/ 0.70)</option>
+          </select>
+        </div>
+
+        <!-- Tarjeta Vinculada y Saldo Inicial -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="txtNuevoCodigoTarjeta" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+              Tarjeta Vinculada <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <i data-lucide="credit-card" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
+              <input type="text" id="txtNuevoCodigoTarjeta" placeholder="Ej. TARJ-1007" required
+                class="w-full text-sm border border-slate-300 rounded-lg pl-9 pr-3 py-2.5 font-mono uppercase focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none">
+            </div>
+          </div>
+          <div>
+            <label for="txtNuevoSaldoInicial" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+              Saldo Inicial (S/) <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <span class="text-slate-400 absolute left-3 top-2.5 text-sm font-semibold">S/</span>
+              <input type="number" id="txtNuevoSaldoInicial" value="10.00" min="0" max="300" step="0.50" required
+                class="w-full text-sm border border-slate-300 rounded-lg pl-9 pr-3 py-2.5 font-bold text-slate-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none">
+            </div>
+          </div>
+        </div>
+
+        <!-- Mensaje Informativo -->
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-600 flex items-start gap-2">
+          <i data-lucide="info" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i>
+          <span>La tarjeta se vinculará con estado <strong>activa</strong> y saldo disponible de inmediato para el validador a bordo.</span>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
+          <button type="button" onclick="cerrarModalPasajero()" class="px-4 py-2.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg font-medium transition">
+            Cancelar
+          </button>
+          <button type="submit" id="btnGuardarPasajero" class="px-5 py-2.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold shadow flex items-center gap-2 transition disabled:opacity-50">
+            <i data-lucide="check" class="w-4 h-4"></i> Guardar Pasajero
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

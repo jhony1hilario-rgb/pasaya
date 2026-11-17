@@ -1,0 +1,852 @@
+{
+  "usuarios": [
+    {
+      "id": "usr-1",
+      "nombres": "Andrea",
+      "apellidos": "Mendoza Quispe",
+      "email": "admin@pasaya.pe",
+      "rol": "administrador",
+      "estado": "activo"
+    },
+    {
+      "id": "usr-2",
+      "nombres": "Carlos",
+      "apellidos": "Ramos Valencia",
+      "email": "operador@pasaya.pe",
+      "rol": "operador",
+      "estado": "activo"
+    },
+    {
+      "id": "usr-3",
+      "nombres": "Lucía",
+      "apellidos": "Fernández Castro",
+      "email": "cajero@pasaya.pe",
+      "rol": "cajero",
+      "estado": "activo"
+    }
+  ],
+  "roles": [
+    {
+      "id": "rol-1",
+      "nombre": "administrador",
+      "descripcion": "Acceso total a la configuración del sistema, gestión financiera, usuarios y auditoría"
+    },
+    {
+      "id": "rol-2",
+      "nombre": "operador",
+      "descripcion": "Supervisión de flotas, control de abordaje, recaudación y registro de unidades"
+    },
+    {
+      "id": "rol-3",
+      "nombre": "cajero",
+      "descripcion": "Atención en puntos autorizados para emisión de tarjetas y recargas de saldo"
+    }
+  ],
+  "pasajeros": [
+    {
+      "id": "pas-1",
+      "tipo_documento": "DNI",
+      "numero_documento": "72345678",
+      "nombres": "Juan Diego",
+      "apellidos": "Pérez Morales",
+      "telefono": "987112233",
+      "email": "juan.perez@gmail.com",
+      "tipo_tarifa": "general",
+      "estado": "activo"
+    },
+    {
+      "id": "pas-2",
+      "tipo_documento": "DNI",
+      "numero_documento": "73456789",
+      "nombres": "María Fernanda",
+      "apellidos": "Gómez Ríos",
+      "telefono": "987223344",
+      "email": "maria.gomez@tecsup.edu.pe",
+      "tipo_tarifa": "estudiante",
+      "fecha_vencimiento_estudiante": "2027-12-31",
+      "estado": "activo"
+    },
+    {
+      "id": "pas-3",
+      "tipo_documento": "DNI",
+      "numero_documento": "74567890",
+      "nombres": "Rodrigo Andrés",
+      "apellidos": "Torres Soto",
+      "telefono": "987334455",
+      "email": "rodrigo.torres@unsa.edu.pe",
+      "tipo_tarifa": "estudiante",
+      "fecha_vencimiento_estudiante": "2027-08-31",
+      "estado": "activo"
+    },
+    {
+      "id": "pas-4",
+      "tipo_documento": "CE",
+      "numero_documento": "00129845",
+      "nombres": "Elena Sofía",
+      "apellidos": "Vásquez Martínez",
+      "telefono": "987445566",
+      "email": "elena.vasquez@outlook.com",
+      "tipo_tarifa": "general",
+      "estado": "activo"
+    },
+    {
+      "id": "pas-5",
+      "tipo_documento": "DNI",
+      "numero_documento": "76789012",
+      "nombres": "Mateo Gabriel",
+      "apellidos": "Flores Cárdenas",
+      "telefono": "987556677",
+      "email": "mateo.flores@yahoo.com",
+      "tipo_tarifa": "general",
+      "estado": "activo"
+    }
+  ],
+  "tarjetas": [
+    {
+      "id": "tar-1",
+      "codigo_tarjeta": "TARJ-1001",
+      "pasajero_id": "pas-1",
+      "tipo_tarifa": "general",
+      "saldo": 63,
+      "estado": "activa",
+      "fecha_emision": "2026-10-01T08:00:00Z"
+    },
+    {
+      "id": "tar-2",
+      "codigo_tarjeta": "TARJ-1002",
+      "pasajero_id": "pas-2",
+      "tipo_tarifa": "estudiante",
+      "saldo": 37.9,
+      "estado": "activa",
+      "fecha_emision": "2026-10-02T09:30:00Z"
+    },
+    {
+      "id": "tar-3",
+      "codigo_tarjeta": "TARJ-1003",
+      "pasajero_id": "pas-3",
+      "tipo_tarifa": "estudiante",
+      "saldo": 18.6,
+      "estado": "activa",
+      "fecha_emision": "2026-10-03T11:15:00Z"
+    },
+    {
+      "id": "tar-4",
+      "codigo_tarjeta": "TARJ-1004",
+      "pasajero_id": "pas-4",
+      "tipo_tarifa": "general",
+      "saldo": 0,
+      "estado": "bloqueada",
+      "fecha_emision": "2026-10-04T14:00:00Z"
+    },
+    {
+      "id": "tar-5",
+      "codigo_tarjeta": "TARJ-1005",
+      "pasajero_id": "pas-4",
+      "tipo_tarifa": "general",
+      "saldo": 31.5,
+      "estado": "activa",
+      "fecha_emision": "2026-10-15T16:20:00Z"
+    },
+    {
+      "id": "tar-6",
+      "codigo_tarjeta": "TARJ-1006",
+      "pasajero_id": "pas-5",
+      "tipo_tarifa": "general",
+      "saldo": 0.4,
+      "estado": "activa",
+      "fecha_emision": "2026-10-18T10:00:00Z"
+    }
+  ],
+  "puntos-recarga": [
+    {
+      "id": "pto-1",
+      "codigo": "PTO-001",
+      "nombre": "Terminal Terrestre Arequipa",
+      "direccion": "Av. Arturo Ibáñez s/n, J.L. Bustamante y Rivero",
+      "estado": "activo"
+    },
+    {
+      "id": "pto-2",
+      "codigo": "PTO-002",
+      "nombre": "Plaza de Armas de Arequipa",
+      "direccion": "Portal de San Agustín 115, Cercado de Arequipa",
+      "estado": "activo"
+    },
+    {
+      "id": "pto-3",
+      "codigo": "PTO-003",
+      "nombre": "Plataforma Andrés Avelino Cáceres",
+      "direccion": "Av. Avelino Cáceres s/n, J.L. Bustamante y Rivero",
+      "estado": "activo"
+    },
+    {
+      "id": "pto-4",
+      "codigo": "PTO-004",
+      "nombre": "Óvalo de Cayma",
+      "direccion": "Av. Ejército cruce con Av. Cayma, Cayma",
+      "estado": "activo"
+    },
+    {
+      "id": "pto-5",
+      "codigo": "PTO-005",
+      "nombre": "Terminal Pesquero Río Seco (Cono Norte)",
+      "direccion": "Av. Vía 54 con Av. Miguel Grau, Cerro Colorado",
+      "estado": "activo"
+    }
+  ],
+  "recargas": [
+    {
+      "id": "rec-1",
+      "tarjeta_id": "tar-1",
+      "punto_recarga_id": "pto-1",
+      "usuario_id": "usr-3",
+      "monto": 20,
+      "saldo_anterior": 0,
+      "saldo_posterior": 20,
+      "fecha_hora": "2026-10-20T08:15:00Z"
+    },
+    {
+      "id": "rec-2",
+      "tarjeta_id": "tar-2",
+      "punto_recarga_id": "pto-2",
+      "usuario_id": "usr-3",
+      "monto": 30,
+      "saldo_anterior": 0,
+      "saldo_posterior": 30,
+      "fecha_hora": "2026-10-20T09:00:00Z"
+    },
+    {
+      "id": "rec-3",
+      "tarjeta_id": "tar-3",
+      "punto_recarga_id": "pto-3",
+      "usuario_id": "usr-3",
+      "monto": 10,
+      "saldo_anterior": 0,
+      "saldo_posterior": 10,
+      "fecha_hora": "2026-10-21T07:45:00Z"
+    },
+    {
+      "id": "rec-4",
+      "tarjeta_id": "tar-4",
+      "punto_recarga_id": "pto-1",
+      "usuario_id": "usr-3",
+      "monto": 35,
+      "saldo_anterior": 0,
+      "saldo_posterior": 35,
+      "fecha_hora": "2026-10-10T12:30:00Z"
+    },
+    {
+      "id": "rec-5",
+      "tarjeta_id": "tar-6",
+      "punto_recarga_id": "pto-5",
+      "usuario_id": "usr-3",
+      "monto": 10,
+      "saldo_anterior": 0,
+      "saldo_posterior": 10,
+      "fecha_hora": "2026-10-22T17:10:00Z"
+    },
+    {
+      "tarjeta_id": "tar-1",
+      "punto_recarga_id": "pto-1",
+      "usuario_id": "usr-2",
+      "monto": 10,
+      "saldo_anterior": 17,
+      "saldo_posterior": 27,
+      "fecha_hora": "2026-11-12T01:42:33.951Z",
+      "id": "a1uyKlWhmO0"
+    },
+    {
+      "tarjeta_id": "tar-2",
+      "punto_recarga_id": "pto-1",
+      "usuario_id": "usr-2",
+      "monto": 10,
+      "saldo_anterior": 28.6,
+      "saldo_posterior": 38.6,
+      "fecha_hora": "2026-11-12T01:43:57.500Z",
+      "id": "JWBFA6-NX4g"
+    },
+    {
+      "tarjeta_id": "tar-1",
+      "punto_recarga_id": "pto-3",
+      "usuario_id": "usr-2",
+      "monto": 10,
+      "saldo_anterior": 24.5,
+      "saldo_posterior": 34.5,
+      "fecha_hora": "2026-11-12T01:44:00.872Z",
+      "id": "y85OzzdlZ9A"
+    },
+    {
+      "tarjeta_id": "tar-1",
+      "punto_recarga_id": "pto-1",
+      "usuario_id": "usr-2",
+      "monto": 10,
+      "saldo_anterior": 34.5,
+      "saldo_posterior": 44.5,
+      "fecha_hora": "2026-11-12T01:44:02.706Z",
+      "id": "yHY6QpLavq0"
+    },
+    {
+      "tarjeta_id": "tar-1",
+      "punto_recarga_id": "pto-1",
+      "usuario_id": "usr-2",
+      "monto": 10,
+      "saldo_anterior": 44.5,
+      "saldo_posterior": 54.5,
+      "fecha_hora": "2026-11-17T17:18:14.603Z",
+      "id": "zuvvRZisEn4"
+    },
+    {
+      "tarjeta_id": "tar-3",
+      "punto_recarga_id": "pto-1",
+      "usuario_id": "usr-2",
+      "monto": 10,
+      "saldo_anterior": 9.3,
+      "saldo_posterior": 19.3,
+      "fecha_hora": "2026-11-17T17:18:18.056Z",
+      "id": "Bjv7SpYDAfY"
+    },
+    {
+      "tarjeta_id": "tar-1",
+      "punto_recarga_id": "pto-3",
+      "usuario_id": "usr-2",
+      "monto": 10,
+      "saldo_anterior": 54.5,
+      "saldo_posterior": 64.5,
+      "fecha_hora": "2026-11-17T17:18:20.939Z",
+      "id": "jVDzNRbzdxQ"
+    }
+  ],
+  "empresas": [
+    {
+      "id": "emp-1",
+      "ruc": "20539874101",
+      "razon_social": "Consorcio Empresarial Cono Norte S.A.C.",
+      "direccion": "Av. Aviación 602, Cerro Colorado, Arequipa",
+      "telefono": "054-254120",
+      "estado": "activa"
+    },
+    {
+      "id": "emp-2",
+      "ruc": "20455612345",
+      "razon_social": "TransCayma S.A.",
+      "direccion": "Av. Ramón Castilla 820, Cayma, Arequipa",
+      "telefono": "054-271500",
+      "estado": "activa"
+    },
+    {
+      "id": "emp-3",
+      "ruc": "20566718290",
+      "razon_social": "Consorcio Paucarpata S.A.",
+      "direccion": "Av. Mariscal Castilla 1120, Paucarpata, Arequipa",
+      "telefono": "054-428890",
+      "estado": "activa"
+    },
+    {
+      "id": "emp-4",
+      "ruc": "20601982341",
+      "razon_social": "Empresa de Transportes Unión Avelino Cáceres S.R.L.",
+      "direccion": "Av. Dolores 450, J.L. Bustamante y Rivero, Arequipa",
+      "telefono": "054-431122",
+      "estado": "activa"
+    },
+    {
+      "id": "emp-5",
+      "ruc": "20788334411",
+      "razon_social": "Socabaya Express S.A.C.",
+      "direccion": "Av. San Martín 305, Socabaya, Arequipa",
+      "telefono": "054-442200",
+      "estado": "activa"
+    }
+  ],
+  "conductores": [
+    {
+      "id": "con-1",
+      "dni": "40123456",
+      "nombres": "Manuel Alberto",
+      "apellidos": "Reyes Chávez",
+      "licencia": "Q40123456",
+      "telefono": "991223344",
+      "estado": "activo"
+    },
+    {
+      "id": "con-2",
+      "dni": "41234567",
+      "nombres": "Víctor Hugo",
+      "apellidos": "Paredes Mamani",
+      "licencia": "Q41234567",
+      "telefono": "992334455",
+      "estado": "activo"
+    },
+    {
+      "id": "con-3",
+      "dni": "42345678",
+      "nombres": "Jorge Luis",
+      "apellidos": "Campos Navarro",
+      "licencia": "Q42345678",
+      "telefono": "993445566",
+      "estado": "activo"
+    },
+    {
+      "id": "con-4",
+      "dni": "43456789",
+      "nombres": "Héctor Rolando",
+      "apellidos": "Salazar Peña",
+      "licencia": "Q43456789",
+      "telefono": "994556677",
+      "estado": "activo"
+    },
+    {
+      "id": "con-5",
+      "dni": "44567890",
+      "nombres": "César Augusto",
+      "apellidos": "Mendoza Vilca",
+      "licencia": "Q44567890",
+      "telefono": "995667788",
+      "estado": "activo"
+    }
+  ],
+  "unidades": [
+    {
+      "id": "und-1",
+      "empresa_id": "emp-1",
+      "conductor_id": "con-1",
+      "placa": "V6A-720",
+      "padron": "CN-01",
+      "capacidad_pasajeros": 50,
+      "estado": "operativo"
+    },
+    {
+      "id": "und-2",
+      "empresa_id": "emp-1",
+      "conductor_id": "con-2",
+      "placa": "V3D-815",
+      "padron": "CN-02",
+      "capacidad_pasajeros": 45,
+      "estado": "operativo"
+    },
+    {
+      "id": "und-3",
+      "empresa_id": "emp-2",
+      "conductor_id": "con-3",
+      "placa": "V9F-640",
+      "padron": "TC-101",
+      "capacidad_pasajeros": 60,
+      "estado": "operativo"
+    },
+    {
+      "id": "und-4",
+      "empresa_id": "emp-2",
+      "conductor_id": "con-4",
+      "placa": "V2K-512",
+      "padron": "TC-102",
+      "capacidad_pasajeros": 55,
+      "estado": "operativo"
+    },
+    {
+      "id": "und-5",
+      "empresa_id": "emp-3",
+      "conductor_id": "con-5",
+      "placa": "V4M-308",
+      "padron": "CP-201",
+      "capacidad_pasajeros": 50,
+      "estado": "operativo"
+    }
+  ],
+  "rutas": [
+    {
+      "id": "rut-1",
+      "codigo_ruta": "R-101",
+      "nombre": "Troncal Cono Norte - Terminal Terrestre",
+      "paradero_inicio": "Paradero Río Seco (Cerro Colorado)",
+      "paradero_fin": "Terminal Terrestre (JLByR)",
+      "distancia_km": 21.5,
+      "estado": "activa"
+    },
+    {
+      "id": "rut-2",
+      "codigo_ruta": "R-102",
+      "nombre": "Corredor Cayma - Centro Histórico",
+      "paradero_inicio": "Bolognesi (Cayma)",
+      "paradero_fin": "Puente Grau (Cercado)",
+      "distancia_km": 12,
+      "estado": "activa"
+    },
+    {
+      "id": "rut-3",
+      "codigo_ruta": "R-201",
+      "nombre": "Interconector Socabaya - Avelino Cáceres",
+      "paradero_inicio": "Ciudad Mi Trabajo (Socabaya)",
+      "paradero_fin": "Plataforma Avelino Cáceres (JLByR)",
+      "distancia_km": 14.5,
+      "estado": "activa"
+    },
+    {
+      "id": "rut-4",
+      "codigo_ruta": "R-305",
+      "nombre": "Ruta Paucarpata - Av. Ejército",
+      "paradero_inicio": "Miguel Grau (Paucarpata)",
+      "paradero_fin": "Mall Plaza / Av. Ejército (Cayma)",
+      "distancia_km": 18.2,
+      "estado": "activa"
+    },
+    {
+      "id": "rut-5",
+      "codigo_ruta": "R-408",
+      "nombre": "Alimentador Hunter - Terminal Terrestre",
+      "paradero_inicio": "Terminal Hunter",
+      "paradero_fin": "Terminal Terrestre (JLByR)",
+      "distancia_km": 9.8,
+      "estado": "activa"
+    }
+  ],
+  "paraderos": [
+    {
+      "id": "par-1",
+      "codigo": "PAR-01",
+      "nombre": "Paradero Río Seco",
+      "ubicacion": "Cerro Colorado"
+    },
+    {
+      "id": "par-2",
+      "codigo": "PAR-02",
+      "nombre": "Óvalo de Cayma",
+      "ubicacion": "Cayma"
+    },
+    {
+      "id": "par-3",
+      "codigo": "PAR-03",
+      "nombre": "Puente Grau / Santa Catalina",
+      "ubicacion": "Arequipa Cercado"
+    },
+    {
+      "id": "par-4",
+      "codigo": "PAR-04",
+      "nombre": "Plataforma Andrés Avelino Cáceres",
+      "ubicacion": "J.L. Bustamante y Rivero"
+    },
+    {
+      "id": "par-5",
+      "codigo": "PAR-05",
+      "nombre": "Terminal Terrestre Arequipa",
+      "ubicacion": "J.L. Bustamante y Rivero"
+    }
+  ],
+  "tarifas": [
+    {
+      "id": "trf-1",
+      "ruta_id": "rut-1",
+      "tipo_pasajero": "general",
+      "monto": 1.5,
+      "estado": "vigente"
+    },
+    {
+      "id": "trf-2",
+      "ruta_id": "rut-1",
+      "tipo_pasajero": "estudiante",
+      "monto": 0.7,
+      "estado": "vigente"
+    },
+    {
+      "id": "trf-3",
+      "ruta_id": "rut-2",
+      "tipo_pasajero": "general",
+      "monto": 1,
+      "estado": "vigente"
+    },
+    {
+      "id": "trf-4",
+      "ruta_id": "rut-2",
+      "tipo_pasajero": "estudiante",
+      "monto": 0.5,
+      "estado": "vigente"
+    },
+    {
+      "id": "trf-5",
+      "ruta_id": "rut-3",
+      "tipo_pasajero": "general",
+      "monto": 1,
+      "estado": "vigente"
+    },
+    {
+      "id": "trf-6",
+      "ruta_id": "rut-3",
+      "tipo_pasajero": "estudiante",
+      "monto": 0.5,
+      "estado": "vigente"
+    }
+  ],
+  "viajes": [
+    {
+      "id": "via-1",
+      "tarjeta_id": "tar-1",
+      "codigo_tarjeta": "TARJ-1001",
+      "unidad_id": "und-1",
+      "ruta_id": "rut-1",
+      "tarifa_monto": 1.5,
+      "saldo_anterior": 20,
+      "saldo_posterior": 18.5,
+      "fecha_hora": "2026-10-25T07:30:00Z",
+      "estado": "exitoso"
+    },
+    {
+      "id": "via-2",
+      "tarjeta_id": "tar-2",
+      "codigo_tarjeta": "TARJ-1002",
+      "unidad_id": "und-1",
+      "ruta_id": "rut-1",
+      "tarifa_monto": 0.7,
+      "saldo_anterior": 30,
+      "saldo_posterior": 29.3,
+      "fecha_hora": "2026-10-25T07:35:00Z",
+      "estado": "exitoso"
+    },
+    {
+      "id": "via-3",
+      "tarjeta_id": "tar-3",
+      "codigo_tarjeta": "TARJ-1003",
+      "unidad_id": "und-2",
+      "ruta_id": "rut-1",
+      "tarifa_monto": 0.7,
+      "saldo_anterior": 10,
+      "saldo_posterior": 9.3,
+      "fecha_hora": "2026-10-25T08:10:00Z",
+      "estado": "exitoso"
+    },
+    {
+      "id": "via-4",
+      "tarjeta_id": "tar-5",
+      "codigo_tarjeta": "TARJ-1005",
+      "unidad_id": "und-3",
+      "ruta_id": "rut-2",
+      "tarifa_monto": 1,
+      "saldo_anterior": 32.5,
+      "saldo_posterior": 31.5,
+      "fecha_hora": "2026-10-25T08:45:00Z",
+      "estado": "exitoso"
+    },
+    {
+      "id": "via-5",
+      "tarjeta_id": "tar-1",
+      "codigo_tarjeta": "TARJ-1001",
+      "unidad_id": "und-1",
+      "ruta_id": "rut-1",
+      "tarifa_monto": 1.5,
+      "saldo_anterior": 18.5,
+      "saldo_posterior": 17,
+      "fecha_hora": "2026-10-25T18:20:00Z",
+      "estado": "exitoso"
+    },
+    {
+      "tarjeta_id": "tar-1",
+      "codigo_tarjeta": "TARJ-1001",
+      "unidad_id": "und-1",
+      "ruta_id": "rut-1",
+      "tarifa_monto": 1.5,
+      "saldo_anterior": 27,
+      "saldo_posterior": 25.5,
+      "fecha_hora": "2026-11-12T01:43:26.740Z",
+      "estado": "exitoso",
+      "id": "CTCVyNz4iNE"
+    },
+    {
+      "tarjeta_id": "tar-1",
+      "codigo_tarjeta": "TARJ-1001",
+      "unidad_id": "und-1",
+      "ruta_id": "rut-2",
+      "tarifa_monto": 1,
+      "saldo_anterior": 25.5,
+      "saldo_posterior": 24.5,
+      "fecha_hora": "2026-11-12T01:43:33.643Z",
+      "estado": "exitoso",
+      "id": "H1PZUa3Iwfg"
+    },
+    {
+      "tarjeta_id": "tar-2",
+      "codigo_tarjeta": "TARJ-1002",
+      "unidad_id": "und-1",
+      "ruta_id": "rut-1",
+      "tarifa_monto": 0.7,
+      "saldo_anterior": 29.3,
+      "saldo_posterior": 28.6,
+      "fecha_hora": "2026-11-12T01:43:48.053Z",
+      "estado": "exitoso",
+      "id": "9W3asuYa0Bs"
+    },
+    {
+      "tarjeta_id": "tar-3",
+      "codigo_tarjeta": "TARJ-1003",
+      "unidad_id": "und-2",
+      "ruta_id": "rut-1",
+      "tarifa_monto": 0.7,
+      "saldo_anterior": 19.3,
+      "saldo_posterior": 18.6,
+      "fecha_hora": "2026-11-17T17:21:01.401Z",
+      "estado": "exitoso",
+      "id": "nKZrIGUgP9c"
+    },
+    {
+      "tarjeta_id": "tar-2",
+      "codigo_tarjeta": "TARJ-1002",
+      "unidad_id": "und-2",
+      "ruta_id": "rut-1",
+      "tarifa_monto": 0.7,
+      "saldo_anterior": 38.6,
+      "saldo_posterior": 37.9,
+      "fecha_hora": "2026-11-17T17:21:08.178Z",
+      "estado": "exitoso",
+      "id": "z0PEyuc-p8A"
+    },
+    {
+      "tarjeta_id": "tar-1",
+      "codigo_tarjeta": "TARJ-1001",
+      "unidad_id": "und-2",
+      "ruta_id": "rut-1",
+      "tarifa_monto": 1.5,
+      "saldo_anterior": 64.5,
+      "saldo_posterior": 63,
+      "fecha_hora": "2026-11-17T17:21:13.434Z",
+      "estado": "exitoso",
+      "id": "OsaGHoapu9A"
+    }
+  ],
+  "recaudaciones": [
+    {
+      "id": "recau-1",
+      "unidad_id": "und-1",
+      "ruta_id": "rut-1",
+      "fecha": "2026-10-25",
+      "total_viajes": 280,
+      "monto_total": 385,
+      "estado": "cerrado",
+      "fecha_cierre": "2026-10-25T23:30:00Z"
+    },
+    {
+      "id": "recau-2",
+      "unidad_id": "und-2",
+      "ruta_id": "rut-1",
+      "fecha": "2026-10-25",
+      "total_viajes": 260,
+      "monto_total": 358,
+      "estado": "cerrado",
+      "fecha_cierre": "2026-10-25T23:45:00Z"
+    },
+    {
+      "id": "recau-3",
+      "unidad_id": "und-3",
+      "ruta_id": "rut-2",
+      "fecha": "2026-10-25",
+      "total_viajes": 310,
+      "monto_total": 295,
+      "estado": "cerrado",
+      "fecha_cierre": "2026-10-25T23:50:00Z"
+    },
+    {
+      "id": "recau-4",
+      "unidad_id": "und-4",
+      "ruta_id": "rut-2",
+      "fecha": "2026-10-25",
+      "total_viajes": 290,
+      "monto_total": 276,
+      "estado": "cerrado",
+      "fecha_cierre": "2026-10-25T23:55:00Z"
+    },
+    {
+      "id": "recau-5",
+      "unidad_id": "und-5",
+      "ruta_id": "rut-3",
+      "fecha": "2026-10-25",
+      "total_viajes": 240,
+      "monto_total": 228,
+      "estado": "cerrado",
+      "fecha_cierre": "2026-10-25T23:40:00Z"
+    }
+  ],
+  "reposiciones": [
+    {
+      "id": "rep-1",
+      "tarjeta_origen_id": "tar-4",
+      "tarjeta_destino_id": "tar-5",
+      "motivo": "robo",
+      "saldo_transferido": 32.5,
+      "fecha_hora": "2026-10-15T16:20:00Z",
+      "usuario_id": "usr-1"
+    }
+  ],
+  "liquidaciones": [
+    {
+      "id": "liq-1",
+      "empresa_id": "emp-1",
+      "periodo_inicio": "2026-10-19",
+      "periodo_fin": "2026-10-25",
+      "total_viajes": 3850,
+      "monto_bruto": 5250,
+      "porcentaje_comision": 5,
+      "monto_comision": 262.5,
+      "monto_neto": 4987.5,
+      "estado": "pagada",
+      "fecha_liquidacion": "2026-10-26T10:00:00Z",
+      "usuario_id": "usr-1"
+    },
+    {
+      "id": "liq-2",
+      "empresa_id": "emp-2",
+      "periodo_inicio": "2026-10-19",
+      "periodo_fin": "2026-10-25",
+      "total_viajes": 4200,
+      "monto_bruto": 4000,
+      "porcentaje_comision": 5,
+      "monto_comision": 200,
+      "monto_neto": 3800,
+      "estado": "pagada",
+      "fecha_liquidacion": "2026-10-26T10:30:00Z",
+      "usuario_id": "usr-1"
+    },
+    {
+      "id": "liq-3",
+      "empresa_id": "emp-3",
+      "periodo_inicio": "2026-10-19",
+      "periodo_fin": "2026-10-25",
+      "total_viajes": 1680,
+      "monto_bruto": 1600,
+      "porcentaje_comision": 5,
+      "monto_comision": 80,
+      "monto_neto": 1520,
+      "estado": "calculada",
+      "fecha_liquidacion": "2026-10-26T11:00:00Z",
+      "usuario_id": "usr-1"
+    }
+  ],
+  "auditoria": [
+    {
+      "id": "aud-1",
+      "usuario_id": "usr-1",
+      "accion": "CONFIG_INICIAL",
+      "entidad": "sistema",
+      "entidad_id": "0",
+      "detalles": "Inicialización del esquema y carga de catálogos base para Arequipa",
+      "ip_origen": "192.168.1.50",
+      "fecha_hora": "2026-10-01T00:00:00Z"
+    },
+    {
+      "id": "aud-2",
+      "usuario_id": "usr-1",
+      "accion": "ALTA_USUARIO",
+      "entidad": "usuario",
+      "entidad_id": "usr-2",
+      "detalles": "Creación de usuario operador",
+      "ip_origen": "192.168.1.50",
+      "fecha_hora": "2026-10-01T00:05:00Z"
+    },
+    {
+      "id": "aud-3",
+      "usuario_id": "usr-1",
+      "accion": "ALTA_USUARIO",
+      "entidad": "usuario",
+      "entidad_id": "usr-3",
+      "detalles": "Creación de usuario cajero",
+      "ip_origen": "192.168.1.50",
+      "fecha_hora": "2026-10-01T00:10:00Z"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}

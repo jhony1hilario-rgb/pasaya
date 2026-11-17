@@ -1,0 +1,1734 @@
+openapi: 3.0.3
+info:
+  title: API Sistema PasaYa
+  description: Contrato de API REST para la plataforma de pago electrónico y gestión del transporte público urbano PasaYa.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Servidor de desarrollo y pruebas (API simulada)
+paths:
+  /auth/login:
+    post:
+      summary: Autenticar usuario
+      description: Autentica las credenciales de un usuario del sistema y devuelve un token de acceso Bearer.
+      tags:
+        - Autenticacion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: operador@pasaya.pe
+                password:
+                  type: string
+                  format: password
+                  example: Password123*
+      responses:
+        '200':
+          description: Autenticación exitosa
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  usuario:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: usr-2
+                      nombres:
+                        type: string
+                        example: Carlos
+                      apellidos:
+                        type: string
+                        example: Ramos Valencia
+                      email:
+                        type: string
+                        example: operador@pasaya.pe
+                      rol:
+                        type: string
+                        example: operador
+        '400':
+          description: Parámetros inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '401':
+          description: Credenciales incorrectas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+
+  /auth/perfil:
+    get:
+      summary: Perfil activo
+      description: Obtiene la información del usuario autenticado en la sesión actual.
+      tags:
+        - Autenticacion
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Perfil obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  usuario:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: usr-2
+                      nombres:
+                        type: string
+                        example: Carlos
+                      apellidos:
+                        type: string
+                        example: Ramos Valencia
+                      email:
+                        type: string
+                        example: operador@pasaya.pe
+                      rol:
+                        type: string
+                        example: operador
+        '401':
+          description: No autorizado o token expirado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+
+  /pasajeros:
+    get:
+      summary: Listar pasajeros
+      description: Retorna la lista de pasajeros registrados con filtros opcionales.
+      tags:
+        - P1 - Pasajeros y Tarjetas
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: tipo_tarifa
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [general, estudiante]
+        - name: numero_documento
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de pasajeros
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pasajero'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '403':
+          description: Acceso denegado por rol
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+    post:
+      summary: Registrar pasajero
+      description: Da de alta a un nuevo usuario del transporte en el padrón del sistema.
+      tags:
+        - P1 - Pasajeros y Tarjetas
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tipo_documento
+                - numero_documento
+                - nombres
+                - apellidos
+                - tipo_tarifa
+              properties:
+                tipo_documento:
+                  type: string
+                  enum: [DNI, CE, PASAPORTE]
+                  example: DNI
+                numero_documento:
+                  type: string
+                  example: '72345678'
+                nombres:
+                  type: string
+                  example: Juan Diego
+                apellidos:
+                  type: string
+                  example: Pérez Morales
+                telefono:
+                  type: string
+                  example: '987112233'
+                email:
+                  type: string
+                  format: email
+                  example: juan.perez@gmail.com
+                tipo_tarifa:
+                  type: string
+                  enum: [general, estudiante]
+                  example: general
+      responses:
+        '201':
+          description: Pasajero registrado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pasajero'
+        '400':
+          description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '409':
+          description: Conflicto por documento o correo duplicado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+
+  /tarjetas:
+    get:
+      summary: Listar tarjetas
+      description: Retorna la lista de tarjetas emitidas en el sistema.
+      tags:
+        - P1 - Pasajeros y Tarjetas
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: pasajero_id
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: codigo_tarjeta
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: estado
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [activa, bloqueada, reemplazada]
+      responses:
+        '200':
+          description: Lista de tarjetas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tarjeta'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '403':
+          description: Acceso denegado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+    post:
+      summary: Emitir tarjeta
+      description: Emite una nueva tarjeta prepago asignada a un pasajero.
+      tags:
+        - P1 - Pasajeros y Tarjetas
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - pasajero_id
+                - codigo_tarjeta
+                - tipo_tarifa
+              properties:
+                pasajero_id:
+                  type: string
+                  example: pas-1
+                codigo_tarjeta:
+                  type: string
+                  example: TARJ-1001
+                tipo_tarifa:
+                  type: string
+                  enum: [general, estudiante]
+                  example: general
+                saldo_inicial:
+                  type: number
+                  format: float
+                  example: 0.00
+      responses:
+        '201':
+          description: Tarjeta emitida exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tarjeta'
+        '400':
+          description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '409':
+          description: Código de tarjeta duplicado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+
+  /tarjetas/{id}/bloqueo:
+    patch:
+      summary: Bloquear tarjeta
+      description: Bloquea preventivamente una tarjeta extraviada o robada.
+      tags:
+        - P7 - Bloqueo y Reposicion
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: tar-4
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - motivo
+              properties:
+                motivo:
+                  type: string
+                  enum: [perdida, robo, deterioro]
+                  example: robo
+      responses:
+        '200':
+          description: Tarjeta bloqueada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tarjeta'
+        '404':
+          description: Tarjeta no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '409':
+          description: Tarjeta ya inactiva o bloqueada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+
+  /puntos-recarga:
+    get:
+      summary: Listar agencias y puntos de recarga
+      description: Consulta los puntos y agencias autorizadas para abonar saldo.
+      tags:
+        - P2 - Recarga de Saldo
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: estado
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [activo, inactivo]
+      responses:
+        '200':
+          description: Lista de puntos de recarga
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PuntoRecarga'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+
+  /recargas:
+    get:
+      summary: Listar recargas
+      description: Obtiene el historial de recargas realizadas.
+      tags:
+        - P2 - Recarga de Saldo
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: tarjeta_id
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: fecha
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Lista de recargas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recarga'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '403':
+          description: Acceso denegado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+    post:
+      summary: Registrar recarga
+      description: Abona saldo monetario a una tarjeta prepago en un punto autorizado.
+      tags:
+        - P2 - Recarga de Saldo
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tarjeta_id
+                - punto_recarga_id
+                - monto
+              properties:
+                tarjeta_id:
+                  type: string
+                  example: tar-1
+                punto_recarga_id:
+                  type: string
+                  example: pto-1
+                monto:
+                  type: number
+                  format: float
+                  example: 20.00
+      responses:
+        '201':
+          description: Recarga procesada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: rec-55
+                  tarjeta_id:
+                    type: string
+                    example: tar-1
+                  monto:
+                    type: number
+                    format: float
+                    example: 20.00
+                  saldo_anterior:
+                    type: number
+                    format: float
+                    example: 12.50
+                  saldo_posterior:
+                    type: number
+                    format: float
+                    example: 32.50
+                  fecha_hora:
+                    type: string
+                    format: date-time
+                    example: 2026-11-10T12:10:00.000Z
+        '400':
+          description: Monto inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '404':
+          description: Tarjeta o punto no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '409':
+          description: Conflicto por límite de saldo excedido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+
+  /empresas:
+    get:
+      summary: Listar empresas
+      description: Obtiene la relación de empresas concesionarias de transporte.
+      tags:
+        - P3 - Empresas y Unidades
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: estado
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [activa, inactiva]
+      responses:
+        '200':
+          description: Lista de empresas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Empresa'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+    post:
+      summary: Crear empresa
+      description: Registra una nueva empresa concesionaria en la plataforma.
+      tags:
+        - P3 - Empresas y Unidades
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ruc
+                - razon_social
+                - direccion
+              properties:
+                ruc:
+                  type: string
+                  example: '20100456781'
+                razon_social:
+                  type: string
+                  example: Transportes San Salvador S.A.C.
+                direccion:
+                  type: string
+                  example: Av. Nicolás Ayllón 1250, San Luis
+                telefono:
+                  type: string
+                  example: 01-3245678
+      responses:
+        '201':
+          description: Empresa creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Empresa'
+        '400':
+          description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '409':
+          description: Conflicto por RUC duplicado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+
+  /unidades:
+    get:
+      summary: Listar unidades
+      description: Lista las unidades vehiculares (buses) registradas.
+      tags:
+        - P3 - Empresas y Unidades
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: empresa_id
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: estado
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [operativo, en_mantenimiento, baja]
+      responses:
+        '200':
+          description: Lista de unidades
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Unidad'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+    post:
+      summary: Registrar unidad
+      description: Da de alta un bus asociado a una empresa concesionaria.
+      tags:
+        - P3 - Empresas y Unidades
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - empresa_id
+                - placa
+                - padron
+                - capacidad_pasajeros
+              properties:
+                empresa_id:
+                  type: string
+                  example: emp-1
+                conductor_id:
+                  type: string
+                  example: con-1
+                placa:
+                  type: string
+                  example: B7A-720
+                padron:
+                  type: string
+                  example: BUS-01
+                capacidad_pasajeros:
+                  type: integer
+                  example: 50
+      responses:
+        '201':
+          description: Unidad registrada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unidad'
+        '400':
+          description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '409':
+          description: Conflicto por placa duplicada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+
+  /rutas:
+    get:
+      summary: Listar rutas
+      description: Retorna las rutas activas con su información de paraderos y tarifas.
+      tags:
+        - P4 - Rutas y Tarifas
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: estado
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [activa, inactiva]
+      responses:
+        '200':
+          description: Lista de rutas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ruta'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+    post:
+      summary: Registrar ruta
+      description: Crea una nueva ruta o línea de transporte público.
+      tags:
+        - P4 - Rutas y Tarifas
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - codigo_ruta
+                - nombre
+                - paradero_inicio
+                - paradero_fin
+                - distancia_km
+              properties:
+                codigo_ruta:
+                  type: string
+                  example: R-101
+                nombre:
+                  type: string
+                  example: 'Línea Roja: Ate - Callao'
+                paradero_inicio:
+                  type: string
+                  example: Terminal Huáscar (Ate)
+                paradero_fin:
+                  type: string
+                  example: Óvalo Garibaldi (Callao)
+                distancia_km:
+                  type: number
+                  format: float
+                  example: 28.50
+      responses:
+        '201':
+          description: Ruta registrada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ruta'
+        '400':
+          description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '409':
+          description: Código de ruta duplicado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+
+  /tarifas:
+    post:
+      summary: Asignar tarifa
+      description: Configura el monto de tarifa para una ruta y tipo de pasajero.
+      tags:
+        - P4 - Rutas y Tarifas
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ruta_id
+                - tipo_pasajero
+                - monto
+              properties:
+                ruta_id:
+                  type: string
+                  example: rut-1
+                tipo_pasajero:
+                  type: string
+                  enum: [general, estudiante]
+                  example: general
+                monto:
+                  type: number
+                  format: float
+                  example: 2.50
+      responses:
+        '201':
+          description: Tarifa asignada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tarifa'
+        '400':
+          description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '409':
+          description: Tarifa ya configurada para esa ruta y tipo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+
+  /viajes:
+    get:
+      summary: Listar viajes
+      description: Consulta las transacciones de cobro de viajes registradas.
+      tags:
+        - P5 - Registro de Viajes (Abordaje)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: unidad_id
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: fecha
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: tarjeta_id
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de viajes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Viaje'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '403':
+          description: Acceso denegado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+    post:
+      summary: Registrar cobro viaje
+      description: Registra el débito automático al momento de abordar la unidad.
+      tags:
+        - P5 - Registro de Viajes (Abordaje)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - codigo_tarjeta
+                - unidad_id
+                - ruta_id
+              properties:
+                codigo_tarjeta:
+                  type: string
+                  example: TARJ-1001
+                unidad_id:
+                  type: string
+                  example: und-1
+                ruta_id:
+                  type: string
+                  example: rut-1
+      responses:
+        '201':
+          description: Cobro de viaje exitoso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: via-105
+                  codigo_tarjeta:
+                    type: string
+                    example: TARJ-1001
+                  pasajero:
+                    type: string
+                    example: Juan Diego Pérez Morales
+                  tipo_tarifa:
+                    type: string
+                    example: general
+                  tarifa_monto:
+                    type: number
+                    format: float
+                    example: 2.50
+                  saldo_anterior:
+                    type: number
+                    format: float
+                    example: 15.00
+                  saldo_posterior:
+                    type: number
+                    format: float
+                    example: 12.50
+                  fecha_hora:
+                    type: string
+                    format: date-time
+                    example: 2026-11-10T12:05:00.000Z
+                  estado:
+                    type: string
+                    example: exitoso
+        '400':
+          description: Parámetros inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '404':
+          description: Tarjeta o unidad no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '409':
+          description: Saldo insuficiente o tarjeta bloqueada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+
+  /recaudaciones:
+    get:
+      summary: Consultar balance
+      description: Consulta los cierres y arqueos de recaudación acumulados.
+      tags:
+        - P6 - Control de Recaudacion
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: unidad_id
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: fecha
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: ruta_id
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de cierres de recaudación
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CierreRecaudacion'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '403':
+          description: Acceso denegado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+
+  /recaudaciones/cierre:
+    post:
+      summary: Efectuar cierre día
+      description: Formaliza el cierre operativo y cuadre monetario por bus, ruta y fecha.
+      tags:
+        - P6 - Control de Recaudacion
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - unidad_id
+                - ruta_id
+                - fecha
+              properties:
+                unidad_id:
+                  type: string
+                  example: und-1
+                ruta_id:
+                  type: string
+                  example: rut-1
+                fecha:
+                  type: string
+                  format: date
+                  example: '2026-11-10'
+      responses:
+        '201':
+          description: Cierre de recaudación procesado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CierreRecaudacion'
+        '400':
+          description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '409':
+          description: Cierre ya registrado para esa unidad y fecha
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+
+  /reposiciones:
+    post:
+      summary: Reponer y transferir
+      description: Emite una nueva tarjeta transfiriendo de forma atómica el saldo de la tarjeta afectada.
+      tags:
+        - P7 - Bloqueo y Reposicion
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tarjeta_origen_id
+                - codigo_nueva_tarjeta
+                - motivo
+              properties:
+                tarjeta_origen_id:
+                  type: string
+                  example: tar-4
+                codigo_nueva_tarjeta:
+                  type: string
+                  example: TARJ-1007
+                motivo:
+                  type: string
+                  enum: [perdida, robo, deterioro]
+                  example: robo
+      responses:
+        '201':
+          description: Reposición procesada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: rep-10
+                  tarjeta_origen:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: tar-4
+                      codigo_tarjeta:
+                        type: string
+                        example: TARJ-1004
+                      estado:
+                        type: string
+                        example: reemplazada
+                  tarjeta_nueva:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: tar-7
+                      codigo_tarjeta:
+                        type: string
+                        example: TARJ-1007
+                      saldo:
+                        type: number
+                        format: float
+                        example: 32.50
+                      estado:
+                        type: string
+                        example: activa
+                  saldo_transferido:
+                    type: number
+                    format: float
+                    example: 32.50
+                  fecha_hora:
+                    type: string
+                    format: date-time
+                    example: 2026-11-10T12:15:00.000Z
+        '400':
+          description: Datos incompletos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '404':
+          description: Tarjeta origen no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '409':
+          description: Conflicto por tarjeta destino existente o estado inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+
+  /liquidaciones:
+    get:
+      summary: Listar liquidaciones
+      description: Consulta las órdenes de liquidación financiera a empresas concesionarias.
+      tags:
+        - P8 - Liquidacion a Empresas
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: empresa_id
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: estado
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [calculada, pagada, anulada]
+      responses:
+        '200':
+          description: Lista de liquidaciones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Liquidacion'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '403':
+          description: Acceso denegado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+    post:
+      summary: Generar liquidación
+      description: Calcula y emite la orden de liquidación consolidando los viajes del periodo.
+      tags:
+        - P8 - Liquidacion a Empresas
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - empresa_id
+                - periodo_inicio
+                - periodo_fin
+              properties:
+                empresa_id:
+                  type: string
+                  example: emp-1
+                periodo_inicio:
+                  type: string
+                  format: date
+                  example: '2026-10-19'
+                periodo_fin:
+                  type: string
+                  format: date
+                  example: '2026-10-25'
+      responses:
+        '201':
+          description: Liquidación generada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Liquidacion'
+        '400':
+          description: Rango de fechas inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '409':
+          description: Conflicto por liquidación ya emitida para ese periodo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+
+  /liquidaciones/{id}/pagar:
+    patch:
+      summary: Pagar liquidación
+      description: Registra el abono formal de una orden de liquidación a la empresa concesionaria.
+      tags:
+        - P8 - Liquidacion a Empresas
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: liq-3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - metodo_pago
+                - comprobante_referencia
+              properties:
+                metodo_pago:
+                  type: string
+                  example: transferencia_bancaria
+                comprobante_referencia:
+                  type: string
+                  example: OP-98765432
+      responses:
+        '200':
+          description: Liquidación pagada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Liquidacion'
+        '404':
+          description: Liquidación no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '409':
+          description: Liquidación ya pagada o anulada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+
+  /auditoria:
+    get:
+      summary: Consultar bitácora
+      description: Consulta el registro inmutable de eventos y auditoría del sistema.
+      tags:
+        - Auditoria
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: entidad
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: usuario_id
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: fecha
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Lista de eventos de auditoría
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Auditoria'
+        '401':
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+        '403':
+          description: Acceso exclusivo para administradores
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorRespuesta'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Ingrese el token JWT emitido por /auth/login
+
+  schemas:
+    ErrorRespuesta:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - codigo
+            - estado
+            - mensaje
+            - ruta
+            - marca_tiempo
+          properties:
+            codigo:
+              type: integer
+              example: 409
+            estado:
+              type: string
+              example: CONFLICT
+            mensaje:
+              type: string
+              example: Saldo insuficiente para abordar la unidad.
+            detalles:
+              type: array
+              items:
+                type: object
+                properties:
+                  campo:
+                    type: string
+                    example: saldo
+                  regla:
+                    type: string
+                    example: saldo_minimo_requerido
+                  esperado:
+                    type: number
+                    example: 2.50
+                  actual:
+                    type: number
+                    example: 1.20
+            ruta:
+              type: string
+              example: /viajes
+            marca_tiempo:
+              type: string
+              format: date-time
+              example: 2026-11-10T12:00:00.000Z
+
+    Pasajero:
+      type: object
+      properties:
+        id:
+          type: string
+          example: pas-1
+        tipo_documento:
+          type: string
+          example: DNI
+        numero_documento:
+          type: string
+          example: '72345678'
+        nombres:
+          type: string
+          example: Juan Diego
+        apellidos:
+          type: string
+          example: Pérez Morales
+        telefono:
+          type: string
+          example: '987112233'
+        email:
+          type: string
+          example: juan.perez@gmail.com
+        tipo_tarifa:
+          type: string
+          example: general
+        estado:
+          type: string
+          example: activo
+
+    Tarjeta:
+      type: object
+      properties:
+        id:
+          type: string
+          example: tar-1
+        codigo_tarjeta:
+          type: string
+          example: TARJ-1001
+        pasajero_id:
+          type: string
+          example: pas-1
+        tipo_tarifa:
+          type: string
+          example: general
+        saldo:
+          type: number
+          format: float
+          example: 15.00
+        estado:
+          type: string
+          example: activa
+        fecha_emision:
+          type: string
+          format: date-time
+          example: 2026-10-01T08:00:00.000Z
+
+    PuntoRecarga:
+      type: object
+      properties:
+        id:
+          type: string
+          example: pto-1
+        codigo:
+          type: string
+          example: PTO-001
+        nombre:
+          type: string
+          example: Terminal Javier Prado
+        direccion:
+          type: string
+          example: Av. Javier Prado Este 4500, Surco
+        estado:
+          type: string
+          example: activo
+
+    Recarga:
+      type: object
+      properties:
+        id:
+          type: string
+          example: rec-1
+        tarjeta_id:
+          type: string
+          example: tar-1
+        punto_recarga_id:
+          type: string
+          example: pto-1
+        usuario_id:
+          type: string
+          example: usr-3
+        monto:
+          type: number
+          format: float
+          example: 20.00
+        saldo_anterior:
+          type: number
+          format: float
+          example: 0.00
+        saldo_posterior:
+          type: number
+          format: float
+          example: 20.00
+        fecha_hora:
+          type: string
+          format: date-time
+          example: 2026-10-20T08:15:00.000Z
+
+    Empresa:
+      type: object
+      properties:
+        id:
+          type: string
+          example: emp-1
+        ruc:
+          type: string
+          example: '20100456781'
+        razon_social:
+          type: string
+          example: Transportes San Salvador S.A.C.
+        direccion:
+          type: string
+          example: Av. Nicolás Ayllón 1250, San Luis
+        telefono:
+          type: string
+          example: 01-3245678
+        estado:
+          type: string
+          example: activa
+
+    Unidad:
+      type: object
+      properties:
+        id:
+          type: string
+          example: und-1
+        empresa_id:
+          type: string
+          example: emp-1
+        conductor_id:
+          type: string
+          example: con-1
+        placa:
+          type: string
+          example: B7A-720
+        padron:
+          type: string
+          example: BUS-01
+        capacidad_pasajeros:
+          type: integer
+          example: 50
+        estado:
+          type: string
+          example: operativo
+
+    Ruta:
+      type: object
+      properties:
+        id:
+          type: string
+          example: rut-1
+        codigo_ruta:
+          type: string
+          example: R-101
+        nombre:
+          type: string
+          example: 'Línea Roja: Ate - Callao'
+        paradero_inicio:
+          type: string
+          example: Terminal Huáscar (Ate)
+        paradero_fin:
+          type: string
+          example: Óvalo Garibaldi (Callao)
+        distancia_km:
+          type: number
+          format: float
+          example: 28.50
+        estado:
+          type: string
+          example: activa
+
+    Tarifa:
+      type: object
+      properties:
+        id:
+          type: string
+          example: trf-1
+        ruta_id:
+          type: string
+          example: rut-1
+        tipo_pasajero:
+          type: string
+          example: general
+        monto:
+          type: number
+          format: float
+          example: 2.50
+        estado:
+          type: string
+          example: vigente
+
+    Viaje:
+      type: object
+      properties:
+        id:
+          type: string
+          example: via-1
+        tarjeta_id:
+          type: string
+          example: tar-1
+        codigo_tarjeta:
+          type: string
+          example: TARJ-1001
+        unidad_id:
+          type: string
+          example: und-1
+        ruta_id:
+          type: string
+          example: rut-1
+        tarifa_monto:
+          type: number
+          format: float
+          example: 2.50
+        saldo_anterior:
+          type: number
+          format: float
+          example: 20.00
+        saldo_posterior:
+          type: number
+          format: float
+          example: 17.50
+        fecha_hora:
+          type: string
+          format: date-time
+          example: 2026-10-25T07:30:00.000Z
+        estado:
+          type: string
+          example: exitoso
+
+    CierreRecaudacion:
+      type: object
+      properties:
+        id:
+          type: string
+          example: recau-1
+        unidad_id:
+          type: string
+          example: und-1
+        ruta_id:
+          type: string
+          example: rut-1
+        fecha:
+          type: string
+          format: date
+          example: '2026-10-25'
+        total_viajes:
+          type: integer
+          example: 180
+        monto_total:
+          type: number
+          format: float
+          example: 412.50
+        estado:
+          type: string
+          example: cerrado
+        fecha_cierre:
+          type: string
+          format: date-time
+          example: 2026-10-25T23:30:00.000Z
+
+    Liquidacion:
+      type: object
+      properties:
+        id:
+          type: string
+          example: liq-1
+        empresa_id:
+          type: string
+          example: emp-1
+        periodo_inicio:
+          type: string
+          format: date
+          example: '2026-10-19'
+        periodo_fin:
+          type: string
+          format: date
+          example: '2026-10-25'
+        total_viajes:
+          type: integer
+          example: 2415
+        monto_bruto:
+          type: number
+          format: float
+          example: 5580.00
+        porcentaje_comision:
+          type: number
+          format: float
+          example: 5.00
+        monto_comision:
+          type: number
+          format: float
+          example: 279.00
+        monto_neto:
+          type: number
+          format: float
+          example: 5301.00
+        estado:
+          type: string
+          example: pagada
+        fecha_liquidacion:
+          type: string
+          format: date-time
+          example: 2026-10-26T10:00:00.000Z
+        usuario_id:
+          type: string
+          example: usr-1
+
+    Auditoria:
+      type: object
+      properties:
+        id:
+          type: string
+          example: aud-1
+        usuario_id:
+          type: string
+          example: usr-1
+        accion:
+          type: string
+          example: CONFIG_INICIAL
+        entidad:
+          type: string
+          example: sistema
+        entidad_id:
+          type: string
+          example: '0'
+        detalles:
+          type: string
+          example: Inicialización del esquema y carga de catálogos base
+        ip_origen:
+          type: string
+          example: 192.168.1.50
+        fecha_hora:
+          type: string
+          format: date-time
+          example: 2026-10-01T00:00:00.000Z
