@@ -7,7 +7,7 @@
 // Detección automática y flexible de la API (100% relativa / sin rutas absolutas):
 // - Si se ejecuta desde un servidor HTTP local en el puerto 3000, usa el origen relativo actual.
 // - Si se abre directamente como archivo local (file://) o desde otro puerto de desarrollo, apunta a http://localhost:3000
-const API_BASE_URL = (typeof window !== 'undefined' && window.location.protocol.startsWith('http') && window.location.origin.includes(':3000'))
+const API_BASE_URL = (typeof window !== 'undefined' && window.location.protocol.startsWith('http'))
   ? window.location.origin
   : 'http://localhost:3000';
 
