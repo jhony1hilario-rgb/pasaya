@@ -193,11 +193,11 @@ const Views = {
       const busesOperativos = unidades.filter(u => u.estado === 'operativo').length;
 
       return `
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-          <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+        <div class="grid-dashboard-metrics">
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
             <div>
               <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Recaudación Total</p>
-              <h3 class="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">S/ ${totalRecaudado.toFixed(2)}</h3>
+              <h3 class="text-3xl font-bold text-slate-800 mt-1">S/ ${totalRecaudado.toFixed(2)}</h3>
               <p class="text-xs text-emerald-600 mt-1 flex items-center gap-1">
                 <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> +12% vs. jornada previa
               </p>
@@ -207,10 +207,10 @@ const Views = {
             </div>
           </div>
 
-          <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
             <div>
               <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Abordajes Realizados</p>
-              <h3 class="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">${totalViajes}</h3>
+              <h3 class="text-3xl font-bold text-slate-800 mt-1">${totalViajes}</h3>
               <p class="text-xs text-cyan-600 mt-1">100% cobro electrónico al subir</p>
             </div>
             <div class="w-12 h-12 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center shrink-0">
@@ -218,10 +218,10 @@ const Views = {
             </div>
           </div>
 
-          <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
             <div>
               <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Flota de Buses</p>
-              <h3 class="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">${busesOperativos} Unidades</h3>
+              <h3 class="text-3xl font-bold text-slate-800 mt-1">${busesOperativos} Unidades</h3>
               <p class="text-xs text-slate-500 mt-1">Concesionarias vinculadas</p>
             </div>
             <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
@@ -230,9 +230,9 @@ const Views = {
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-6">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-4">
-            <h4 class="font-bold text-slate-800 text-base sm:text-lg">Últimos Abordajes Registrados en Tiempo Real</h4>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h4 class="font-bold text-slate-800 text-lg">Últimos Abordajes Registrados en Tiempo Real</h4>
             <span class="text-xs text-slate-400">Transacciones sincronizadas</span>
           </div>
           <div class="overflow-x-auto" style="-webkit-overflow-scrolling: touch;">
@@ -279,15 +279,15 @@ const Views = {
       ]);
 
       return `
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+        <div class="grid-two-columns">
           <!-- Formulario Simulador de Abordaje -->
-          <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100">
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
             <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
               <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold shrink-0">
                 <i data-lucide="smartphone-charging" class="w-5 h-5"></i>
               </div>
               <div>
-                <h3 class="font-bold text-base sm:text-lg text-slate-800">Simulador de Validador de Bus</h3>
+                <h3 class="font-bold text-lg text-slate-800">Simulador de Validador de Bus</h3>
                 <p class="text-xs text-slate-500">Proceso 5: Débito automático al momento de abordar</p>
               </div>
             </div>
@@ -616,9 +616,9 @@ const Views = {
       ]);
 
       return `
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-          <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100">
-            <h4 class="font-bold text-slate-800 text-base sm:text-lg mb-4">P3: Concesionarias y Unidades Registradas</h4>
+        <div class="grid-two-columns">
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+            <h4 class="font-bold text-slate-800 text-lg mb-4">P3: Concesionarias y Unidades Registradas</h4>
             <div class="space-y-3">
               ${unidades.map(u => `
                 <div class="p-3 border border-slate-100 rounded-xl flex items-center justify-between hover:bg-slate-50 gap-2">
@@ -723,24 +723,26 @@ function toggleSidebar(forceState) {
   const backdrop = document.getElementById('sidebarBackdrop');
   if (!sidebar) return;
 
-  const isClosed = sidebar.classList.contains('-translate-x-full');
-  const shouldOpen = (forceState !== undefined) ? forceState : isClosed;
+  const isOpen = sidebar.classList.contains('sidebar-open');
+  const shouldOpen = (forceState !== undefined) ? forceState : !isOpen;
 
   if (shouldOpen) {
-    sidebar.classList.remove('-translate-x-full');
-    if (backdrop) backdrop.classList.remove('hidden');
-    document.body.classList.add('overflow-hidden', 'md:overflow-auto');
+    sidebar.classList.add('sidebar-open');
+    if (backdrop) backdrop.classList.add('backdrop-open');
+    document.body.classList.add('overflow-hidden');
   } else {
-    sidebar.classList.add('-translate-x-full');
-    if (backdrop) backdrop.classList.add('hidden');
-    document.body.classList.remove('overflow-hidden', 'md:overflow-auto');
+    sidebar.classList.remove('sidebar-open');
+    if (backdrop) backdrop.classList.remove('backdrop-open');
+    document.body.classList.remove('overflow-hidden');
   }
-  lucide.createIcons();
+  if (window.lucide) {
+    lucide.createIcons();
+  }
 }
 
 async function navigate(viewName) {
-  // En dispositivos móviles (< 768px), cerrar automáticamente la barra lateral al seleccionar una opción
-  if (typeof toggleSidebar === 'function' && window.innerWidth < 768) {
+  // En dispositivos móviles (<= 768px), cerrar automáticamente la barra lateral al seleccionar una opción
+  if (typeof toggleSidebar === 'function' && window.innerWidth <= 768) {
     toggleSidebar(false);
   }
 
