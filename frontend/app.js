@@ -193,50 +193,50 @@ const Views = {
       const busesOperativos = unidades.filter(u => u.estado === 'operativo').length;
 
       return `
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
             <div>
               <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Recaudación Total</p>
-              <h3 class="text-3xl font-bold text-slate-800 mt-1">S/ ${totalRecaudado.toFixed(2)}</h3>
+              <h3 class="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">S/ ${totalRecaudado.toFixed(2)}</h3>
               <p class="text-xs text-emerald-600 mt-1 flex items-center gap-1">
                 <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> +12% vs. jornada previa
               </p>
             </div>
-            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
               <i data-lucide="dollar-sign" class="w-6 h-6"></i>
             </div>
           </div>
 
-          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+          <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
             <div>
               <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Abordajes Realizados</p>
-              <h3 class="text-3xl font-bold text-slate-800 mt-1">${totalViajes}</h3>
+              <h3 class="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">${totalViajes}</h3>
               <p class="text-xs text-cyan-600 mt-1">100% cobro electrónico al subir</p>
             </div>
-            <div class="w-12 h-12 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center">
+            <div class="w-12 h-12 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center shrink-0">
               <i data-lucide="users" class="w-6 h-6"></i>
             </div>
           </div>
 
-          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+          <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
             <div>
               <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Flota de Buses</p>
-              <h3 class="text-3xl font-bold text-slate-800 mt-1">${busesOperativos} Unidades</h3>
+              <h3 class="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">${busesOperativos} Unidades</h3>
               <p class="text-xs text-slate-500 mt-1">Concesionarias vinculadas</p>
             </div>
-            <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
               <i data-lucide="bus" class="w-6 h-6"></i>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h4 class="font-bold text-slate-800 text-lg">Últimos Abordajes Registrados en Tiempo Real</h4>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-4">
+            <h4 class="font-bold text-slate-800 text-base sm:text-lg">Últimos Abordajes Registrados en Tiempo Real</h4>
             <span class="text-xs text-slate-400">Transacciones sincronizadas</span>
           </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
+          <div class="overflow-x-auto" style="-webkit-overflow-scrolling: touch;">
+            <table class="w-full text-left text-sm whitespace-nowrap min-w-[620px]">
               <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold">
                 <tr>
                   <th class="p-3">ID Viaje</th>
@@ -279,15 +279,15 @@ const Views = {
       ]);
 
       return `
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
           <!-- Formulario Simulador de Abordaje -->
-          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+          <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100">
             <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
-              <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+              <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold shrink-0">
                 <i data-lucide="smartphone-charging" class="w-5 h-5"></i>
               </div>
               <div>
-                <h3 class="font-bold text-lg text-slate-800">Simulador de Validador de Bus</h3>
+                <h3 class="font-bold text-base sm:text-lg text-slate-800">Simulador de Validador de Bus</h3>
                 <p class="text-xs text-slate-500">Proceso 5: Débito automático al momento de abordar</p>
               </div>
             </div>
@@ -295,23 +295,23 @@ const Views = {
             <form id="formAbordaje" class="space-y-4">
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">1. Unidad / Bus Operativo:</label>
-                <select id="selUnidad" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:border-emerald-500 focus:outline-none">
+                <select id="selUnidad" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:border-emerald-500 focus:outline-none min-h-[44px]">
                   ${unidades.map(u => `<option value="${u.id}">${u.padron} - Placa: ${u.placa} (Cap: ${u.capacidad_pasajeros})</option>`).join('')}
                 </select>
               </div>
 
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">2. Ruta de Circulación:</label>
-                <select id="selRuta" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:border-emerald-500 focus:outline-none">
+                <select id="selRuta" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:border-emerald-500 focus:outline-none min-h-[44px]">
                   ${rutas.map(r => `<option value="${r.id}">${r.codigo_ruta}: ${r.nombre}</option>`).join('')}
                 </select>
               </div>
 
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">3. Código de Tarjeta del Pasajero:</label>
-                <div class="flex gap-2">
-                  <input type="text" id="txtCodigoTarjeta" value="TARJ-1001" placeholder="Ej. TARJ-1001" class="flex-1 text-sm border border-slate-300 rounded-lg p-2.5 font-mono uppercase focus:border-emerald-500 focus:outline-none" required>
-                  <button type="button" onclick="probarTarjetaSinSaldo()" class="px-3 py-2 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium" title="Cargar tarjeta para simular error 409">
+                <div class="flex flex-col sm:flex-row gap-2">
+                  <input type="text" id="txtCodigoTarjeta" value="TARJ-1001" placeholder="Ej. TARJ-1001" class="flex-1 text-sm border border-slate-300 rounded-lg p-2.5 font-mono uppercase focus:border-emerald-500 focus:outline-none min-h-[44px]" required>
+                  <button type="button" onclick="probarTarjetaSinSaldo()" class="px-3 py-2 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium min-h-[44px] flex items-center justify-center shrink-0 transition" title="Cargar tarjeta para simular error 409">
                     Probar Sin Saldo
                   </button>
                 </div>
@@ -319,7 +319,7 @@ const Views = {
               </div>
 
               <div class="pt-4">
-                <button type="submit" id="btnValidarAbordaje" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                <button type="submit" id="btnValidarAbordaje" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 min-h-[48px]">
                   <i data-lucide="check-circle" class="w-5 h-5"></i> Simular Validación de Abordaje
                 </button>
               </div>
@@ -327,7 +327,7 @@ const Views = {
           </div>
 
           <!-- Monitor de Validación en Cabina -->
-          <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-xl flex flex-col justify-between">
+          <div class="bg-slate-900 text-white p-4 sm:p-6 rounded-2xl shadow-xl flex flex-col justify-between">
             <div>
               <div class="flex items-center justify-between pb-4 border-b border-slate-800">
                 <span class="text-xs text-slate-400 uppercase font-mono tracking-widest">Pantalla del Validador a Bordo</span>
@@ -336,7 +336,7 @@ const Views = {
                 </span>
               </div>
 
-              <div id="pantallaValidador" class="my-8 text-center p-8 rounded-xl bg-slate-950/60 border border-slate-800 min-h-[180px] flex flex-col items-center justify-center">
+              <div id="pantallaValidador" class="my-6 sm:my-8 text-center p-6 sm:p-8 rounded-xl bg-slate-950/60 border border-slate-800 min-h-[160px] sm:min-h-[180px] flex flex-col items-center justify-center">
                 <i data-lucide="wifi" class="w-12 h-12 text-slate-600 mb-3 animate-pulse"></i>
                 <p class="text-slate-400 text-sm">Acerque su tarjeta prepago al lector</p>
                 <p class="text-xs text-slate-600 mt-1">Tarifa General: S/ 1.50 | Estudiante: S/ 0.70</p>
@@ -362,13 +362,13 @@ const Views = {
       ]);
 
       return `
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 max-w-xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-6 max-w-xl mx-auto">
           <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
-            <div class="w-10 h-10 rounded-xl bg-cyan-100 text-cyan-700 flex items-center justify-center font-bold">
+            <div class="w-10 h-10 rounded-xl bg-cyan-100 text-cyan-700 flex items-center justify-center font-bold shrink-0">
               <i data-lucide="plus-circle" class="w-5 h-5"></i>
             </div>
             <div>
-              <h3 class="font-bold text-lg text-slate-800">P2: Recarga de Saldo en Efectivo</h3>
+              <h3 class="font-bold text-base sm:text-lg text-slate-800">P2: Recarga de Saldo en Efectivo</h3>
               <p class="text-xs text-slate-500">Abono instantáneo en puntos y agencias autorizadas</p>
             </div>
           </div>
@@ -376,25 +376,25 @@ const Views = {
           <form id="formRecarga" class="space-y-4">
             <div>
               <label class="block text-xs font-semibold text-slate-600 mb-1">Punto de Recarga:</label>
-              <select id="selPuntoRecarga" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:border-cyan-500 focus:outline-none">
+              <select id="selPuntoRecarga" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:border-cyan-500 focus:outline-none min-h-[44px]">
                 ${puntos.map(p => `<option value="${p.id}">${p.codigo} - ${p.nombre}</option>`).join('')}
               </select>
             </div>
 
             <div>
               <label class="block text-xs font-semibold text-slate-600 mb-1">Tarjeta Beneficiaria:</label>
-              <select id="selTarjetaRecarga" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 font-mono focus:border-cyan-500 focus:outline-none">
+              <select id="selTarjetaRecarga" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 font-mono focus:border-cyan-500 focus:outline-none min-h-[44px]">
                 ${tarjetas.map(t => `<option value="${t.id}">${t.codigo_tarjeta} (Saldo actual: S/ ${t.saldo.toFixed(2)}) - ${t.tipo_tarifa}</option>`).join('')}
               </select>
             </div>
 
             <div>
               <label class="block text-xs font-semibold text-slate-600 mb-1">Monto a Recargar (S/):</label>
-              <input type="number" id="txtMontoRecarga" min="1" max="100" step="0.5" value="10.00" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 font-bold text-slate-800 focus:border-cyan-500 focus:outline-none" required>
+              <input type="number" id="txtMontoRecarga" min="1" max="100" step="0.5" value="10.00" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 font-bold text-slate-800 focus:border-cyan-500 focus:outline-none min-h-[44px]" required>
               <p class="text-xs text-slate-400 mt-1">Mínimo S/ 1.00, máximo S/ 100.00 por operación.</p>
             </div>
 
-            <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-4 rounded-xl shadow transition flex items-center justify-center gap-2">
+            <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-4 rounded-xl shadow transition flex items-center justify-center gap-2 min-h-[48px]">
               <i data-lucide="check" class="w-4 h-4"></i> Procesar Recarga
             </button>
           </form>
@@ -413,51 +413,53 @@ const Views = {
       ]);
 
       return `
-        <div class="space-y-6">
-          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+        <div class="space-y-4 sm:space-y-6">
+          <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 class="font-bold text-lg text-slate-800">P1: Padrón de Pasajeros y Tarjetas Emitidas</h3>
+              <h3 class="font-bold text-base sm:text-lg text-slate-800">P1: Padrón de Pasajeros y Tarjetas Emitidas</h3>
               <p class="text-xs text-slate-500">Gestión de usuarios del transporte y tipos de tarifa</p>
             </div>
-            <button onclick="abrirModalPasajero()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-lg flex items-center gap-1.5 transition shadow hover:shadow-md">
+            <button onclick="abrirModalPasajero()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg flex items-center justify-center gap-1.5 transition shadow hover:shadow-md min-h-[44px] shrink-0">
               <i data-lucide="user-plus" class="w-4 h-4"></i> Nuevo Pasajero
             </button>
           </div>
 
           <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <table class="w-full text-left text-sm">
-              <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold">
-                <tr>
-                  <th class="p-3.5">ID</th>
-                  <th class="p-3.5">Documento</th>
-                  <th class="p-3.5">Nombres y Apellidos</th>
-                  <th class="p-3.5">Tipo Tarifa</th>
-                  <th class="p-3.5">Tarjeta Vinculada</th>
-                  <th class="p-3.5">Saldo</th>
-                  <th class="p-3.5">Estado</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100">
-                ${pasajeros.map(p => {
-                  const tarj = tarjetas.find(t => t.pasajero_id === p.id && t.estado === 'activa') || tarjetas.find(t => t.pasajero_id === p.id);
-                  return `
-                    <tr class="hover:bg-slate-50">
-                      <td class="p-3.5 font-mono text-xs text-slate-400">${p.id}</td>
-                      <td class="p-3.5 font-medium">${p.tipo_documento}: ${p.numero_documento}</td>
-                      <td class="p-3.5 font-bold text-slate-800">${p.nombres} ${p.apellidos}</td>
-                      <td class="p-3.5">
-                        <span class="px-2 py-0.5 rounded-full text-xs font-semibold ${p.tipo_tarifa === 'estudiante' ? 'bg-indigo-100 text-indigo-800' : 'bg-slate-100 text-slate-700'}">
-                          ${p.tipo_tarifa}
-                        </span>
-                      </td>
-                      <td class="p-3.5 font-mono font-medium text-emerald-700">${tarj ? tarj.codigo_tarjeta : 'Sin tarjeta'}</td>
-                      <td class="p-3.5 font-bold">${tarj ? `S/ ${tarj.saldo.toFixed(2)}` : '-'}</td>
-                      <td class="p-3.5"><span class="px-2 py-0.5 text-xs font-medium rounded-full badge-active">${p.estado}</span></td>
-                    </tr>
-                  `;
-                }).join('')}
-              </tbody>
-            </table>
+            <div class="overflow-x-auto" style="-webkit-overflow-scrolling: touch;">
+              <table class="w-full text-left text-sm whitespace-nowrap min-w-[680px]">
+                <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold">
+                  <tr>
+                    <th class="p-3.5">ID</th>
+                    <th class="p-3.5">Documento</th>
+                    <th class="p-3.5">Nombres y Apellidos</th>
+                    <th class="p-3.5">Tipo Tarifa</th>
+                    <th class="p-3.5">Tarjeta Vinculada</th>
+                    <th class="p-3.5">Saldo</th>
+                    <th class="p-3.5">Estado</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  ${pasajeros.map(p => {
+                    const tarj = tarjetas.find(t => t.pasajero_id === p.id && t.estado === 'activa') || tarjetas.find(t => t.pasajero_id === p.id);
+                    return `
+                      <tr class="hover:bg-slate-50">
+                        <td class="p-3.5 font-mono text-xs text-slate-400">${p.id}</td>
+                        <td class="p-3.5 font-medium">${p.tipo_documento}: ${p.numero_documento}</td>
+                        <td class="p-3.5 font-bold text-slate-800">${p.nombres} ${p.apellidos}</td>
+                        <td class="p-3.5">
+                          <span class="px-2 py-0.5 rounded-full text-xs font-semibold ${p.tipo_tarifa === 'estudiante' ? 'bg-indigo-100 text-indigo-800' : 'bg-slate-100 text-slate-700'}">
+                            ${p.tipo_tarifa}
+                          </span>
+                        </td>
+                        <td class="p-3.5 font-mono font-medium text-emerald-700">${tarj ? tarj.codigo_tarjeta : 'Sin tarjeta'}</td>
+                        <td class="p-3.5 font-bold">${tarj ? `S/ ${tarj.saldo.toFixed(2)}` : '-'}</td>
+                        <td class="p-3.5"><span class="px-2 py-0.5 text-xs font-medium rounded-full badge-active">${p.estado}</span></td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       `;
@@ -470,41 +472,43 @@ const Views = {
     try {
       const recaudaciones = await ApiService.get('recaudaciones');
       return `
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-          <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6 pb-4 border-b border-slate-100">
             <div>
-              <h3 class="font-bold text-lg text-slate-800">P6: Control y Cierres de Recaudación Diaria</h3>
+              <h3 class="font-bold text-base sm:text-lg text-slate-800">P6: Control y Cierres de Recaudación Diaria</h3>
               <p class="text-xs text-slate-500">Liquidación y cuadre transaccional por bus y jornada</p>
             </div>
-            <span class="text-xs font-mono bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg">Filtro: Jornadas Consolidadas</span>
+            <span class="text-xs font-mono bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg shrink-0">Filtro: Jornadas Consolidadas</span>
           </div>
 
-          <table class="w-full text-left text-sm">
-            <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold">
-              <tr>
-                <th class="p-3">ID Cierre</th>
-                <th class="p-3">Unidad</th>
-                <th class="p-3">Ruta</th>
-                <th class="p-3">Fecha</th>
-                <th class="p-3">Total Viajes</th>
-                <th class="p-3">Monto Recaudado</th>
-                <th class="p-3">Estado</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-              ${recaudaciones.map(r => `
-                <tr class="hover:bg-slate-50">
-                  <td class="p-3 font-mono font-medium text-slate-400">${r.id}</td>
-                  <td class="p-3 font-bold text-slate-700">${r.unidad_id}</td>
-                  <td class="p-3">${r.ruta_id}</td>
-                  <td class="p-3">${r.fecha}</td>
-                  <td class="p-3 font-semibold">${r.total_viajes} pax</td>
-                  <td class="p-3 font-bold text-emerald-700">S/ ${(r.monto_total || 0).toFixed(2)}</td>
-                  <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-semibold badge-active">${r.estado}</span></td>
+          <div class="overflow-x-auto" style="-webkit-overflow-scrolling: touch;">
+            <table class="w-full text-left text-sm whitespace-nowrap min-w-[650px]">
+              <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold">
+                <tr>
+                  <th class="p-3">ID Cierre</th>
+                  <th class="p-3">Unidad</th>
+                  <th class="p-3">Ruta</th>
+                  <th class="p-3">Fecha</th>
+                  <th class="p-3">Total Viajes</th>
+                  <th class="p-3">Monto Recaudado</th>
+                  <th class="p-3">Estado</th>
                 </tr>
-              `).join('')}
-            </tbody>
-          </table>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                ${recaudaciones.map(r => `
+                  <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-mono font-medium text-slate-400">${r.id}</td>
+                    <td class="p-3 font-bold text-slate-700">${r.unidad_id}</td>
+                    <td class="p-3">${r.ruta_id}</td>
+                    <td class="p-3">${r.fecha}</td>
+                    <td class="p-3 font-semibold">${r.total_viajes} pax</td>
+                    <td class="p-3 font-bold text-emerald-700">S/ ${(r.monto_total || 0).toFixed(2)}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-semibold badge-active">${r.estado}</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
         </div>
       `;
     } catch (err) {
@@ -514,13 +518,13 @@ const Views = {
 
   reposicion: async () => {
     return `
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 max-w-xl mx-auto">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-6 max-w-xl mx-auto">
         <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
-          <div class="w-10 h-10 rounded-xl bg-red-100 text-red-700 flex items-center justify-center font-bold">
+          <div class="w-10 h-10 rounded-xl bg-red-100 text-red-700 flex items-center justify-center font-bold shrink-0">
             <i data-lucide="shield-alert" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="font-bold text-lg text-slate-800">P7: Bloqueo y Reposición de Tarjeta</h3>
+            <h3 class="font-bold text-base sm:text-lg text-slate-800">P7: Bloqueo y Reposición de Tarjeta</h3>
             <p class="text-xs text-slate-500">Inmovilización por robo o pérdida y transferencia del saldo íntegro</p>
           </div>
         </div>
@@ -528,13 +532,13 @@ const Views = {
         <form id="formReposicion" class="space-y-4" onsubmit="event.preventDefault(); simularReposicion();">
           <div>
             <label class="block text-xs font-semibold text-slate-600 mb-1">Tarjeta a Inmovilizar / Bloquear:</label>
-            <input type="text" id="txtTarjetaBloquear" value="TARJ-1006" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 font-mono focus:border-red-500 focus:outline-none" required>
+            <input type="text" id="txtTarjetaBloquear" value="TARJ-1006" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 font-mono focus:border-red-500 focus:outline-none min-h-[44px]" required>
             <p class="text-xs text-slate-400 mt-1">Saldo registrado en sistema: S/ 5.00</p>
           </div>
 
           <div>
             <label class="block text-xs font-semibold text-slate-600 mb-1">Motivo del Trámite:</label>
-            <select class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:border-red-500 focus:outline-none">
+            <select class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:border-red-500 focus:outline-none min-h-[44px]">
               <option value="robo">Robo / Hurto</option>
               <option value="perdida">Extravío / Pérdida</option>
               <option value="deterioro">Deterioro Físico</option>
@@ -543,10 +547,10 @@ const Views = {
 
           <div>
             <label class="block text-xs font-semibold text-slate-600 mb-1">Código de la Nueva Tarjeta Entregada:</label>
-            <input type="text" id="txtTarjetaNueva" value="TARJ-1008" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 font-mono focus:border-emerald-500 focus:outline-none" required>
+            <input type="text" id="txtTarjetaNueva" value="TARJ-1008" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 font-mono focus:border-emerald-500 focus:outline-none min-h-[44px]" required>
           </div>
 
-          <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl shadow transition flex items-center justify-center gap-2">
+          <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl shadow transition flex items-center justify-center gap-2 min-h-[48px]">
             <i data-lucide="refresh-cw" class="w-4 h-4"></i> Ejecutar Bloqueo y Migración de Saldo
           </button>
         </form>
@@ -558,42 +562,44 @@ const Views = {
     try {
       const liquidaciones = await ApiService.get('liquidaciones');
       return `
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-          <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6 pb-4 border-b border-slate-100">
             <div>
-              <h3 class="font-bold text-lg text-slate-800">P8: Órdenes de Liquidación a Empresas</h3>
+              <h3 class="font-bold text-base sm:text-lg text-slate-800">P8: Órdenes de Liquidación a Empresas</h3>
               <p class="text-xs text-slate-500">Liquidación periódica con retención del 5% de comisión de plataforma</p>
             </div>
           </div>
 
-          <table class="w-full text-left text-sm">
-            <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold">
-              <tr>
-                <th class="p-3">ID Liquidación</th>
-                <th class="p-3">Empresa Concesionaria</th>
-                <th class="p-3">Periodo</th>
-                <th class="p-3">Total Viajes</th>
-                <th class="p-3">Monto Bruto</th>
-                <th class="p-3">Comisión (5%)</th>
-                <th class="p-3">Monto Neto a Pagar</th>
-                <th class="p-3">Estado</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-              ${liquidaciones.map(l => `
-                <tr class="hover:bg-slate-50">
-                  <td class="p-3 font-mono font-medium">${l.id}</td>
-                  <td class="p-3 font-bold text-slate-700">${l.empresa_id}</td>
-                  <td class="p-3 text-xs text-slate-500">${l.periodo_inicio} al ${l.periodo_fin}</td>
-                  <td class="p-3 font-semibold">${l.total_viajes}</td>
-                  <td class="p-3">S/ ${(l.monto_bruto || 0).toFixed(2)}</td>
-                  <td class="p-3 text-red-600 font-medium">- S/ ${(l.monto_comision || 0).toFixed(2)}</td>
-                  <td class="p-3 font-bold text-emerald-700 text-base">S/ ${(l.monto_neto || 0).toFixed(2)}</td>
-                  <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-semibold ${l.estado === 'pagada' ? 'badge-active' : 'bg-amber-100 text-amber-800'}">${l.estado}</span></td>
+          <div class="overflow-x-auto" style="-webkit-overflow-scrolling: touch;">
+            <table class="w-full text-left text-sm whitespace-nowrap min-w-[750px]">
+              <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold">
+                <tr>
+                  <th class="p-3">ID Liquidación</th>
+                  <th class="p-3">Empresa Concesionaria</th>
+                  <th class="p-3">Periodo</th>
+                  <th class="p-3">Total Viajes</th>
+                  <th class="p-3">Monto Bruto</th>
+                  <th class="p-3">Comisión (5%)</th>
+                  <th class="p-3">Monto Neto a Pagar</th>
+                  <th class="p-3">Estado</th>
                 </tr>
-              `).join('')}
-            </tbody>
-          </table>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                ${liquidaciones.map(l => `
+                  <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-mono font-medium">${l.id}</td>
+                    <td class="p-3 font-bold text-slate-700">${l.empresa_id}</td>
+                    <td class="p-3 text-xs text-slate-500">${l.periodo_inicio} al ${l.periodo_fin}</td>
+                    <td class="p-3 font-semibold">${l.total_viajes}</td>
+                    <td class="p-3">S/ ${(l.monto_bruto || 0).toFixed(2)}</td>
+                    <td class="p-3 text-red-600 font-medium">- S/ ${(l.monto_comision || 0).toFixed(2)}</td>
+                    <td class="p-3 font-bold text-emerald-700 text-base">S/ ${(l.monto_neto || 0).toFixed(2)}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded-full text-xs font-semibold ${l.estado === 'pagada' ? 'badge-active' : 'bg-amber-100 text-amber-800'}">${l.estado}</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
         </div>
       `;
     } catch (err) {
@@ -610,30 +616,30 @@ const Views = {
       ]);
 
       return `
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-            <h4 class="font-bold text-slate-800 text-lg mb-4">P3: Concesionarias y Unidades Registradas</h4>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+          <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100">
+            <h4 class="font-bold text-slate-800 text-base sm:text-lg mb-4">P3: Concesionarias y Unidades Registradas</h4>
             <div class="space-y-3">
               ${unidades.map(u => `
-                <div class="p-3 border border-slate-100 rounded-xl flex items-center justify-between hover:bg-slate-50">
-                  <div>
+                <div class="p-3 border border-slate-100 rounded-xl flex items-center justify-between hover:bg-slate-50 gap-2">
+                  <div class="min-w-0">
                     <span class="font-bold text-slate-800">${u.padron}</span> (Placa: <span class="font-mono text-emerald-700 font-semibold">${u.placa}</span>)
                     <p class="text-xs text-slate-400">Capacidad: ${u.capacidad_pasajeros} pasajeros</p>
                   </div>
-                  <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold badge-active">${u.estado}</span>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold badge-active shrink-0">${u.estado}</span>
                 </div>
               `).join('')}
             </div>
           </div>
 
-          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-            <h4 class="font-bold text-slate-800 text-lg mb-4">P4: Rutas y Corredores Autorizados</h4>
+          <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100">
+            <h4 class="font-bold text-slate-800 text-base sm:text-lg mb-4">P4: Rutas y Corredores Autorizados</h4>
             <div class="space-y-3">
               ${rutas.map(r => `
                 <div class="p-3 border border-slate-100 rounded-xl hover:bg-slate-50">
-                  <div class="flex items-center justify-between mb-1">
+                  <div class="flex items-center justify-between mb-1 gap-2">
                     <span class="font-bold text-slate-800 font-mono text-emerald-700">${r.codigo_ruta}</span>
-                    <span class="text-xs text-slate-500">${r.distancia_km} km</span>
+                    <span class="text-xs text-slate-500 shrink-0">${r.distancia_km} km</span>
                   </div>
                   <p class="text-sm font-semibold text-slate-700">${r.nombre}</p>
                   <p class="text-xs text-slate-400 mt-1">${r.paradero_inicio} ➔ ${r.paradero_fin}</p>
@@ -652,38 +658,40 @@ const Views = {
     try {
       const auditoria = await ApiService.get('auditoria');
       return `
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-          <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6 pb-4 border-b border-slate-100">
             <div>
-              <h3 class="font-bold text-lg text-slate-800">Bitácora de Eventos de Auditoría (RNF-SEG-04)</h3>
+              <h3 class="font-bold text-base sm:text-lg text-slate-800">Bitácora de Eventos de Auditoría (RNF-SEG-04)</h3>
               <p class="text-xs text-slate-500">Registro inmutable de trazabilidad y seguridad</p>
             </div>
           </div>
 
-          <table class="w-full text-left text-sm font-mono text-xs">
-            <thead class="bg-slate-50 text-slate-500 uppercase font-semibold">
-              <tr>
-                <th class="p-3">ID</th>
-                <th class="p-3">Usuario</th>
-                <th class="p-3">Acción</th>
-                <th class="p-3">Entidad</th>
-                <th class="p-3">Detalle / Payload</th>
-                <th class="p-3">Marca de Tiempo</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-              ${auditoria.map(a => `
-                <tr class="hover:bg-slate-50">
-                  <td class="p-3 text-slate-400">${a.id}</td>
-                  <td class="p-3 font-semibold text-indigo-700">${a.usuario_id}</td>
-                  <td class="p-3 font-bold text-slate-800">${a.accion}</td>
-                  <td class="p-3 text-emerald-700">${a.entidad}</td>
-                  <td class="p-3 text-slate-600">${typeof a.detalles === 'object' ? JSON.stringify(a.detalles) : a.detalles}</td>
-                  <td class="p-3 text-slate-400">${new Date(a.fecha_hora).toLocaleString()}</td>
+          <div class="overflow-x-auto" style="-webkit-overflow-scrolling: touch;">
+            <table class="w-full text-left text-sm font-mono text-xs whitespace-nowrap min-w-[700px]">
+              <thead class="bg-slate-50 text-slate-500 uppercase font-semibold">
+                <tr>
+                  <th class="p-3">ID</th>
+                  <th class="p-3">Usuario</th>
+                  <th class="p-3">Acción</th>
+                  <th class="p-3">Entidad</th>
+                  <th class="p-3">Detalle / Payload</th>
+                  <th class="p-3">Marca de Tiempo</th>
                 </tr>
-              `).join('')}
-            </tbody>
-          </table>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                ${auditoria.map(a => `
+                  <tr class="hover:bg-slate-50">
+                    <td class="p-3 text-slate-400">${a.id}</td>
+                    <td class="p-3 font-semibold text-indigo-700">${a.usuario_id}</td>
+                    <td class="p-3 font-bold text-slate-800">${a.accion}</td>
+                    <td class="p-3 text-emerald-700">${a.entidad}</td>
+                    <td class="p-3 text-slate-600">${typeof a.detalles === 'object' ? JSON.stringify(a.detalles) : a.detalles}</td>
+                    <td class="p-3 text-slate-400">${new Date(a.fecha_hora).toLocaleString()}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
         </div>
       `;
     } catch (err) {
@@ -694,12 +702,12 @@ const Views = {
 
 function renderErrorState(msg) {
   return `
-    <div class="bg-amber-50 border border-amber-200 text-amber-800 p-6 rounded-2xl text-center">
+    <div class="bg-amber-50 border border-amber-200 text-amber-800 p-4 sm:p-6 rounded-2xl text-center">
       <i data-lucide="alert-triangle" class="w-8 h-8 text-amber-600 mx-auto mb-2"></i>
-      <h4 class="font-bold">Error de Conexión o Datos</h4>
+      <h4 class="font-bold text-base">Error de Conexión o Datos</h4>
       <p class="text-xs mt-1">${msg}</p>
       <div class="mt-4">
-        <code class="text-xs bg-amber-100 text-amber-900 px-3 py-1.5 rounded-lg font-mono">
+        <code class="text-xs bg-amber-100 text-amber-900 px-3 py-1.5 rounded-lg font-mono inline-block break-all">
           Ejecutar: iniciar.bat (o: npx json-server mock-api/db.json --port 3000)
         </code>
       </div>
@@ -708,9 +716,34 @@ function renderErrorState(msg) {
 }
 
 // ------------------------------------------------------------------------------
-// 4. CONTROLADOR DE NAVEGACIÓN Y EVENTOS
+// 4. CONTROLADOR DE NAVEGACIÓN Y RESPONSIVIDAD MÓVIL
 // ------------------------------------------------------------------------------
+function toggleSidebar(forceState) {
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebarBackdrop');
+  if (!sidebar) return;
+
+  const isClosed = sidebar.classList.contains('-translate-x-full');
+  const shouldOpen = (forceState !== undefined) ? forceState : isClosed;
+
+  if (shouldOpen) {
+    sidebar.classList.remove('-translate-x-full');
+    if (backdrop) backdrop.classList.remove('hidden');
+    document.body.classList.add('overflow-hidden', 'md:overflow-auto');
+  } else {
+    sidebar.classList.add('-translate-x-full');
+    if (backdrop) backdrop.classList.add('hidden');
+    document.body.classList.remove('overflow-hidden', 'md:overflow-auto');
+  }
+  lucide.createIcons();
+}
+
 async function navigate(viewName) {
+  // En dispositivos móviles (< 768px), cerrar automáticamente la barra lateral al seleccionar una opción
+  if (typeof toggleSidebar === 'function' && window.innerWidth < 768) {
+    toggleSidebar(false);
+  }
+
   const container = document.getElementById('viewContainer');
   const title = document.getElementById('viewTitle');
 
@@ -722,7 +755,7 @@ async function navigate(viewName) {
 
   title.innerText = viewName.toUpperCase();
   container.innerHTML = `
-    <div class="flex items-center justify-center p-16 text-slate-400">
+    <div class="flex items-center justify-center p-12 sm:p-16 text-slate-400">
       <i data-lucide="loader" class="w-8 h-8 animate-spin text-emerald-600 mr-3"></i>
       <span>Cargando datos desde la API simulada...</span>
     </div>
@@ -992,7 +1025,7 @@ function simularReposicion() {
 
 function showToast(message, type = 'success') {
   const toast = document.getElementById('toast');
-  toast.className = `fixed bottom-6 right-6 max-w-md p-4 rounded-xl shadow-2xl flex items-center gap-3 transition-all z-50 ${
+  toast.className = `fixed bottom-4 sm:bottom-6 right-4 sm:right-6 left-4 sm:left-auto max-w-md p-4 rounded-xl shadow-2xl flex items-center gap-3 transition-all z-50 ${
     type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'
   }`;
   toast.innerHTML = `
@@ -1037,9 +1070,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Cerrar modal al presionar la tecla Escape
+  // Cerrar modal o sidebar al presionar la tecla Escape
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') cerrarModalPasajero();
+    if (e.key === 'Escape') {
+      cerrarModalPasajero();
+      toggleSidebar(false);
+    }
   });
 
   navigate('dashboard');
