@@ -287,8 +287,8 @@ const Views = {
                 <i data-lucide="smartphone-charging" class="w-5 h-5"></i>
               </div>
               <div>
-                <h3 class="font-bold text-lg text-slate-800">Simulador de Validador de Bus</h3>
-                <p class="text-xs text-slate-500">Proceso 5: Débito automático al momento de abordar</p>
+                <h3 class="font-bold text-lg text-slate-800">1. Abordaje: Validador de Bus</h3>
+                <p class="text-xs text-slate-500">Módulo 1: Débito automático al momento de abordar</p>
               </div>
             </div>
 
@@ -368,7 +368,7 @@ const Views = {
               <i data-lucide="plus-circle" class="w-5 h-5"></i>
             </div>
             <div>
-              <h3 class="font-bold text-base sm:text-lg text-slate-800">P2: Recarga de Saldo en Efectivo</h3>
+              <h3 class="font-bold text-base sm:text-lg text-slate-800">2. Recarga de Saldo en Efectivo</h3>
               <p class="text-xs text-slate-500">Abono instantáneo en puntos y agencias autorizadas</p>
             </div>
           </div>
@@ -416,7 +416,7 @@ const Views = {
         <div class="space-y-4 sm:space-y-6">
           <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 class="font-bold text-base sm:text-lg text-slate-800">P1: Padrón de Pasajeros y Tarjetas Emitidas</h3>
+              <h3 class="font-bold text-base sm:text-lg text-slate-800">3. Padrón de Pasajeros y Tarjetas Emitidas</h3>
               <p class="text-xs text-slate-500">Gestión de usuarios del transporte y tipos de tarifa</p>
             </div>
             <button onclick="abrirModalPasajero()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg flex items-center justify-center gap-1.5 transition shadow hover:shadow-md min-h-[44px] shrink-0">
@@ -475,7 +475,7 @@ const Views = {
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-6">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6 pb-4 border-b border-slate-100">
             <div>
-              <h3 class="font-bold text-base sm:text-lg text-slate-800">P6: Control y Cierres de Recaudación Diaria</h3>
+              <h3 class="font-bold text-base sm:text-lg text-slate-800">4. Control y Cierres de Recaudación Diaria</h3>
               <p class="text-xs text-slate-500">Liquidación y cuadre transaccional por bus y jornada</p>
             </div>
             <span class="text-xs font-mono bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg shrink-0">Filtro: Jornadas Consolidadas</span>
@@ -524,7 +524,7 @@ const Views = {
             <i data-lucide="shield-alert" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="font-bold text-base sm:text-lg text-slate-800">P7: Bloqueo y Reposición de Tarjeta</h3>
+            <h3 class="font-bold text-base sm:text-lg text-slate-800">5. Bloqueo y Reposición de Tarjeta</h3>
             <p class="text-xs text-slate-500">Inmovilización por robo o pérdida y transferencia del saldo íntegro</p>
           </div>
         </div>
@@ -565,7 +565,7 @@ const Views = {
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-6">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6 pb-4 border-b border-slate-100">
             <div>
-              <h3 class="font-bold text-base sm:text-lg text-slate-800">P8: Órdenes de Liquidación a Empresas</h3>
+              <h3 class="font-bold text-base sm:text-lg text-slate-800">6. Órdenes de Liquidación a Empresas</h3>
               <p class="text-xs text-slate-500">Liquidación periódica con retención del 5% de comisión de plataforma</p>
             </div>
           </div>
@@ -618,7 +618,7 @@ const Views = {
       return `
         <div class="grid-two-columns">
           <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-            <h4 class="font-bold text-slate-800 text-lg mb-4">P3: Concesionarias y Unidades Registradas</h4>
+            <h4 class="font-bold text-slate-800 text-lg mb-4">7.1 Concesionarias y Unidades Registradas</h4>
             <div class="space-y-3">
               ${unidades.map(u => `
                 <div class="p-3 border border-slate-100 rounded-xl flex items-center justify-between hover:bg-slate-50 gap-2">
@@ -633,7 +633,7 @@ const Views = {
           </div>
 
           <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-100">
-            <h4 class="font-bold text-slate-800 text-base sm:text-lg mb-4">P4: Rutas y Corredores Autorizados</h4>
+            <h4 class="font-bold text-slate-800 text-base sm:text-lg mb-4">7.2 Rutas y Corredores Autorizados</h4>
             <div class="space-y-3">
               ${rutas.map(r => `
                 <div class="p-3 border border-slate-100 rounded-xl hover:bg-slate-50">
@@ -661,7 +661,7 @@ const Views = {
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-6">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6 pb-4 border-b border-slate-100">
             <div>
-              <h3 class="font-bold text-base sm:text-lg text-slate-800">Bitácora de Eventos de Auditoría (RNF-SEG-04)</h3>
+              <h3 class="font-bold text-base sm:text-lg text-slate-800">8. Bitácora de Eventos de Auditoría (RNF-SEG-04)</h3>
               <p class="text-xs text-slate-500">Registro inmutable de trazabilidad y seguridad</p>
             </div>
           </div>
@@ -749,13 +749,34 @@ async function navigate(viewName) {
   const container = document.getElementById('viewContainer');
   const title = document.getElementById('viewTitle');
 
+  // Títulos de navegación asociados a cada módulo
+  const viewTitles = {
+    dashboard: 'Dashboard General',
+    abordaje: '1. Abordaje (Cobro)',
+    recargas: '2. Recarga de Saldo',
+    pasajeros: '3. Pasajeros y Tarjetas',
+    recaudacion: '4. Recaudación Diaria',
+    reposicion: '5. Bloqueo y Reposición',
+    liquidaciones: '6. Liquidaciones',
+    flota: '7. Flota y Rutas',
+    auditoria: '8. Bitácora Auditoría'
+  };
+
+  if (title) {
+    title.innerText = viewTitles[viewName] || viewName.toUpperCase();
+  }
+
   // Actualizar estilos activos de menú
   document.querySelectorAll('.nav-item').forEach(el => {
-    el.classList.remove('text-emerald-400', 'bg-slate-800', 'font-medium');
-    el.classList.add('text-slate-300');
+    const isCurrent = el.getAttribute('data-view') === viewName || el.getAttribute('onclick')?.includes(`'${viewName}'`);
+    if (isCurrent) {
+      el.classList.add('text-emerald-400', 'bg-slate-800', 'font-medium');
+      el.classList.remove('text-slate-300');
+    } else {
+      el.classList.remove('text-emerald-400', 'bg-slate-800', 'font-medium');
+      el.classList.add('text-slate-300');
+    }
   });
-
-  title.innerText = viewName.toUpperCase();
   container.innerHTML = `
     <div class="flex items-center justify-center p-12 sm:p-16 text-slate-400">
       <i data-lucide="loader" class="w-8 h-8 animate-spin text-emerald-600 mr-3"></i>

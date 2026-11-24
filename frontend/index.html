@@ -157,32 +157,32 @@
 
     <!-- Menú de Navegación -->
     <nav class="flex-1 px-3 py-2 space-y-1 overflow-y-auto text-sm" id="navMenu">
-      <button onclick="navigate('dashboard')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-emerald-400 bg-slate-800 font-medium transition">
+      <button onclick="navigate('dashboard')" data-view="dashboard" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-emerald-400 bg-slate-800 font-medium transition">
         <i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0"></i> Dashboard
       </button>
-      <button onclick="navigate('abordaje')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
-        <i data-lucide="bus" class="w-4 h-4 shrink-0"></i> P5: Abordaje (Cobro)
+      <button onclick="navigate('abordaje')" data-view="abordaje" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+        <i data-lucide="bus" class="w-4 h-4 shrink-0"></i> 1. Abordaje (Cobro)
       </button>
-      <button onclick="navigate('recargas')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
-        <i data-lucide="wallet" class="w-4 h-4 shrink-0"></i> P2: Recarga de Saldo
+      <button onclick="navigate('recargas')" data-view="recargas" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+        <i data-lucide="wallet" class="w-4 h-4 shrink-0"></i> 2. Recarga de Saldo
       </button>
-      <button onclick="navigate('pasajeros')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
-        <i data-lucide="credit-card" class="w-4 h-4 shrink-0"></i> P1: Pasajeros y Tarjetas
+      <button onclick="navigate('pasajeros')" data-view="pasajeros" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+        <i data-lucide="credit-card" class="w-4 h-4 shrink-0"></i> 3. Pasajeros y Tarjetas
       </button>
-      <button onclick="navigate('recaudacion')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
-        <i data-lucide="bar-chart-3" class="w-4 h-4 shrink-0"></i> P6: Recaudación Diaria
+      <button onclick="navigate('recaudacion')" data-view="recaudacion" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+        <i data-lucide="bar-chart-3" class="w-4 h-4 shrink-0"></i> 4. Recaudación Diaria
       </button>
-      <button onclick="navigate('reposicion')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
-        <i data-lucide="shield-alert" class="w-4 h-4 shrink-0"></i> P7: Bloqueo y Reposición
+      <button onclick="navigate('reposicion')" data-view="reposicion" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+        <i data-lucide="shield-alert" class="w-4 h-4 shrink-0"></i> 5. Bloqueo y Reposición
       </button>
-      <button onclick="navigate('liquidaciones')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
-        <i data-lucide="landmark" class="w-4 h-4 shrink-0"></i> P8: Liquidaciones
+      <button onclick="navigate('liquidaciones')" data-view="liquidaciones" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+        <i data-lucide="landmark" class="w-4 h-4 shrink-0"></i> 6. Liquidaciones
       </button>
-      <button onclick="navigate('flota')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
-        <i data-lucide="truck" class="w-4 h-4 shrink-0"></i> P3 y P4: Flota y Rutas
+      <button onclick="navigate('flota')" data-view="flota" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+        <i data-lucide="truck" class="w-4 h-4 shrink-0"></i> 7. Flota y Rutas
       </button>
-      <button onclick="navigate('auditoria')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
-        <i data-lucide="history" class="w-4 h-4 shrink-0"></i> Bitácora Auditoría
+      <button onclick="navigate('auditoria')" data-view="auditoria" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
+        <i data-lucide="history" class="w-4 h-4 shrink-0"></i> 8. Bitácora Auditoría
       </button>
     </nav>
 
@@ -222,7 +222,7 @@
     <div id="toast" class="fixed bottom-6 right-6 max-w-md p-4 rounded-xl shadow-2xl flex items-start gap-3 transition-all z-50 hidden"></div>
   </main>
 
-  <!-- Modal Interactivo: Registrar Nuevo Pasajero (P1) -->
+  <!-- Modal Interactivo: Registrar Nuevo Pasajero (Módulo 3) -->
   <div id="modalNuevoPasajero" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto hidden">
     <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full border border-slate-100 overflow-hidden my-auto max-h-[92vh] flex flex-col" onclick="event.stopPropagation()">
       <!-- Modal Header -->
@@ -233,7 +233,7 @@
           </div>
           <div class="min-w-0">
             <h3 class="font-bold text-sm sm:text-base text-white truncate">Registrar Nuevo Pasajero</h3>
-            <p class="text-[11px] sm:text-xs text-slate-400 truncate">P1: Emisión de usuario y tarjeta prepago</p>
+            <p class="text-[11px] sm:text-xs text-slate-400 truncate">Emisión de usuario y tarjeta prepago</p>
           </div>
         </div>
         <button type="button" onclick="cerrarModalPasajero()" class="text-slate-400 hover:text-white p-2 rounded-lg transition min-w-[44px] min-h-[44px] flex items-center justify-center shrink-0" title="Cerrar">
