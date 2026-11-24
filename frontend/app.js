@@ -11,13 +11,164 @@ const API_BASE_URL = (typeof window !== 'undefined' && window.location.protocol.
   ? window.location.origin
   : 'http://localhost:3000';
 
-let currentUser = {
-  id: 'usr-2',
-  nombres: 'Carlos',
-  apellidos: 'Ramos Valencia',
-  rol: 'operador',
-  email: 'operador@pasaya.pe'
-};
+const AUTH_STORAGE_KEY = 'pasaya_auth_session';
+
+const USUARIOS_SISTEMA = [
+  {
+    id: 'usr-pasajero',
+    usuario: 'pasajero',
+    email: 'pasajero@pasaya.pe',
+    password: '123456',
+    nombres: 'Lucía Fernández',
+    rol: 'pasajero',
+    rolLabel: 'Pasajero',
+    defaultView: 'pasajeros',
+    allowedViews: ['pasajeros', 'recargas']
+  },
+  {
+    id: 'usr-conductor',
+    usuario: 'conductor',
+    email: 'conductor@pasaya.pe',
+    password: '123456',
+    nombres: 'Carlos Ramos',
+    rol: 'conductor',
+    rolLabel: 'Conductor',
+    defaultView: 'dashboard',
+    allowedViews: ['dashboard', 'abordaje', 'recaudacion']
+  },
+  {
+    id: 'usr-admin',
+    usuario: 'admin',
+    email: 'admin@pasaya.pe',
+    password: '123456',
+    nombres: 'Andrea Mendoza',
+    rol: 'administrador',
+    rolLabel: 'Administrador',
+    defaultView: 'dashboard',
+    allowedViews: [
+      'dashboard',
+      'abordaje',
+      'recargas',
+      'pasajeros',
+      'recaudacion',
+      'reposicion',
+      'liquidaciones',
+      'flota',
+      'auditoria'
+    ]
+  }
+];
+
+let currentUser = null;
+let currentView = null;
+
+// ------------------------------------------------------------------------------
+// 0. AUTENTICACIÓN Y CONTROL DE ACCESO POR ROL
+// ------------------------------------------------------------------------------
+function obtenerSesionGuardada() {
+  try {
+    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return USUARIOS_SISTEMA.find(u => u.id === parsed.id) || null;
+  } catch (_) {
+    return null;
+  }
+}
+
+function guardarSesion(user) {
+  try {
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ id: user.id, rol: user.rol }));
+  } catch (_) { /* ignorar error de almacenamiento */ }
+}
+
+function mostrarLogin() {
+  const loginScreen = document.getElementById('loginScreen');
+  const appShell = document.getElementById('appShell');
+  const loginError = document.getElementById('loginError');
+  if (loginScreen) loginScreen.classList.remove('hidden');
+  if (appShell) appShell.classList.add('hidden');
+  if (loginError) loginError.classList.add('hidden');
+  if (window.lucide) lucide.createIcons();
+}
+
+function aplicarPermisosMenu() {
+  if (!currentUser) return;
+
+  const sidebarName = document.getElementById('sidebarUserName');
+  const sidebarRole = document.getElementById('sidebarUserRole');
+  const topbarLabel = document.getElementById('userNameLabel');
+
+  if (sidebarName) sidebarName.textContent = currentUser.nombres;
+  if (sidebarRole) sidebarRole.textContent = currentUser.rolLabel;
+  if (topbarLabel) topbarLabel.textContent = `${currentUser.nombres} (${currentUser.rolLabel})`;
+
+  document.querySelectorAll('#navMenu .nav-item[data-view]').forEach(btn => {
+    const vista = btn.getAttribute('data-view');
+    if (currentUser.allowedViews.includes(vista)) {
+      btn.classList.remove('hidden');
+    } else {
+      btn.classList.add('hidden');
+    }
+  });
+}
+
+function mostrarApp(user) {
+  currentUser = user;
+  guardarSesion(user);
+
+  const loginScreen = document.getElementById('loginScreen');
+  const appShell = document.getElementById('appShell');
+  if (loginScreen) loginScreen.classList.add('hidden');
+  if (appShell) appShell.classList.remove('hidden');
+
+  aplicarPermisosMenu();
+  navigate(user.defaultView);
+}
+
+function iniciarSesion(identificador, password) {
+  const limpio = (identificador || '').trim().toLowerCase();
+  const user = USUARIOS_SISTEMA.find(u =>
+    (u.usuario === limpio || u.email.toLowerCase() === limpio) && u.password === password
+  );
+
+  const loginError = document.getElementById('loginError');
+  const loginErrorText = document.getElementById('loginErrorText');
+
+  if (!user) {
+    if (loginError) loginError.classList.remove('hidden');
+    if (loginErrorText) loginErrorText.textContent = 'Credenciales inválidas. Verifique su usuario/correo y contraseña.';
+    return false;
+  }
+
+  if (loginError) loginError.classList.add('hidden');
+  mostrarApp(user);
+  showToast(`Bienvenido, ${user.nombres} (${user.rolLabel})`, 'success');
+  return true;
+}
+
+function loginRapido(rolClave) {
+  const user = USUARIOS_SISTEMA.find(u => u.usuario === rolClave || u.rol === rolClave);
+  if (!user) return;
+  const txtUser = document.getElementById('txtLoginUsuario');
+  const txtPass = document.getElementById('txtLoginPassword');
+  if (txtUser) txtUser.value = user.email;
+  if (txtPass) txtPass.value = user.password;
+  iniciarSesion(user.email, user.password);
+}
+
+function cerrarSesion() {
+  currentUser = null;
+  currentView = null;
+  try {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+  } catch (_) { /* ignorar */ }
+  const formLogin = document.getElementById('formLogin');
+  if (formLogin) formLogin.reset();
+  toggleSidebar(false);
+  mostrarLogin();
+  showToast('Sesión cerrada correctamente.', 'success');
+}
 
 // ------------------------------------------------------------------------------
 // 1. CAPA DE SERVICIOS (Llamadas Fetch Centralizadas)
@@ -795,6 +946,20 @@ function toggleSidebar(forceState) {
 }
 
 async function navigate(viewName) {
+  // Verificar autenticación obligatoria
+  if (!currentUser) {
+    mostrarLogin();
+    return;
+  }
+
+  // Control de acceso por rol: redirigir a la vista por defecto si no tiene permiso
+  if (!currentUser.allowedViews.includes(viewName)) {
+    showToast(`Acceso restringido para el rol ${currentUser.rolLabel}. Redirigiendo...`, 'error');
+    viewName = currentUser.defaultView;
+  }
+
+  currentView = viewName;
+
   // En dispositivos móviles (<= 768px), cerrar automáticamente la barra lateral al seleccionar una opción
   if (typeof toggleSidebar === 'function' && window.innerWidth <= 768) {
     toggleSidebar(false);
@@ -1304,21 +1469,23 @@ function showToast(message, type = 'success') {
 }
 
 function simulateReload() {
-  navigate('dashboard');
+  if (!currentUser) {
+    mostrarLogin();
+    return;
+  }
+  navigate(currentView || currentUser.defaultView);
 }
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
-  // Selector de usuario / rol
-  const userSelector = document.getElementById('userSelector');
-  if (userSelector) {
-    userSelector.onchange = (e) => {
-      const val = e.target.value;
-      if (val === 'usr-1') currentUser = { id: 'usr-1', rol: 'administrador', nombres: 'Andrea Mendoza' };
-      if (val === 'usr-2') currentUser = { id: 'usr-2', rol: 'operador', nombres: 'Carlos Ramos' };
-      if (val === 'usr-3') currentUser = { id: 'usr-3', rol: 'cajero', nombres: 'Lucía Fernández' };
-      document.getElementById('userNameLabel').innerText = `${currentUser.nombres} (${currentUser.rol})`;
-      showToast(`Sesión cambiada a ${currentUser.nombres} (${currentUser.rol})`, 'success');
+  // Listener del formulario de Login
+  const formLogin = document.getElementById('formLogin');
+  if (formLogin) {
+    formLogin.onsubmit = (e) => {
+      e.preventDefault();
+      const usuario = document.getElementById('txtLoginUsuario').value;
+      const password = document.getElementById('txtLoginPassword').value;
+      iniciarSesion(usuario, password);
     };
   }
 
@@ -1344,5 +1511,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  navigate('dashboard');
+  // Verificar sesión guardada en localStorage
+  const sesionGuardada = obtenerSesionGuardada();
+  if (sesionGuardada) {
+    mostrarApp(sesionGuardada);
+  } else {
+    mostrarLogin();
+  }
 });

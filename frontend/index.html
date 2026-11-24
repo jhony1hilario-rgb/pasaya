@@ -122,7 +122,86 @@
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased flex min-h-screen">
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
+
+  <!-- Pantalla de Inicio de Sesión (Login Obligatorio) -->
+  <section id="loginScreen" class="min-h-screen w-full bg-slate-900 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
+      <!-- Cabecera Login -->
+      <div class="bg-slate-950 text-white p-6 text-center border-b border-slate-800">
+        <div class="w-14 h-14 rounded-2xl bg-emerald-600 flex items-center justify-center text-white font-bold text-2xl shadow-lg mx-auto mb-3">
+          P
+        </div>
+        <h1 class="font-bold text-2xl tracking-tight text-white">PasaYa</h1>
+        <p class="text-xs text-emerald-400 font-medium mt-1">Sistema de Pago Electrónico · Transporte Urbano</p>
+      </div>
+
+      <!-- Formulario de Autenticación -->
+      <form id="formLogin" class="p-6 space-y-4">
+        <div id="loginError" class="hidden p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center gap-2">
+          <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
+          <span id="loginErrorText">Usuario o contraseña incorrectos.</span>
+        </div>
+
+        <div>
+          <label for="txtLoginUsuario" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">
+            Usuario o Correo
+          </label>
+          <div class="relative">
+            <i data-lucide="user" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
+            <input type="text" id="txtLoginUsuario" placeholder="Ej. admin@pasaya.pe o admin" required autocomplete="username"
+              class="w-full text-sm border border-slate-300 rounded-xl pl-9 pr-3 py-2.5 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none min-h-[44px]">
+          </div>
+        </div>
+
+        <div>
+          <label for="txtLoginPassword" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">
+            Contraseña
+          </label>
+          <div class="relative">
+            <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
+            <input type="password" id="txtLoginPassword" placeholder="••••••" required autocomplete="current-password"
+              class="w-full text-sm border border-slate-300 rounded-xl pl-9 pr-3 py-2.5 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none min-h-[44px]">
+          </div>
+        </div>
+
+        <button type="submit" id="btnLogin"
+          class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 min-h-[48px]">
+          <i data-lucide="log-in" class="w-5 h-5"></i> Ingresar
+        </button>
+
+        <!-- Acceso rápido de demostración -->
+        <div class="pt-4 border-t border-slate-100">
+          <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider text-center mb-2.5">
+            Acceso rápido · Usuarios de prueba (clave: 123456)
+          </p>
+          <div class="grid grid-cols-3 gap-2">
+            <button type="button" onclick="loginRapido('pasajero')"
+              class="p-2 rounded-xl border border-slate-200 hover:border-cyan-500 hover:bg-cyan-50 text-center transition group">
+              <i data-lucide="user-check" class="w-4 h-4 text-cyan-600 mx-auto mb-1"></i>
+              <span class="block text-xs font-bold text-slate-700 group-hover:text-cyan-700">Pasajero</span>
+              <span class="block text-[10px] text-slate-400 truncate">pasajero</span>
+            </button>
+            <button type="button" onclick="loginRapido('conductor')"
+              class="p-2 rounded-xl border border-slate-200 hover:border-amber-500 hover:bg-amber-50 text-center transition group">
+              <i data-lucide="bus" class="w-4 h-4 text-amber-600 mx-auto mb-1"></i>
+              <span class="block text-xs font-bold text-slate-700 group-hover:text-amber-700">Conductor</span>
+              <span class="block text-[10px] text-slate-400 truncate">conductor</span>
+            </button>
+            <button type="button" onclick="loginRapido('admin')"
+              class="p-2 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 text-center transition group">
+              <i data-lucide="shield" class="w-4 h-4 text-emerald-600 mx-auto mb-1"></i>
+              <span class="block text-xs font-bold text-slate-700 group-hover:text-emerald-700">Admin</span>
+              <span class="block text-[10px] text-slate-400 truncate">admin</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Contenedor Principal de la Aplicación (oculto hasta iniciar sesión) -->
+  <div id="appShell" class="flex min-h-screen w-full hidden">
 
   <!-- Fondo oscuro (Backdrop) para Drawer Móvil -->
   <div id="sidebarBackdrop" onclick="toggleSidebar(false)"></div>
@@ -145,14 +224,13 @@
       </button>
     </div>
 
-    <!-- Perfil Simulado / Rol -->
+    <!-- Perfil Autenticado -->
     <div class="p-4 bg-slate-800/60 m-3 rounded-lg border border-slate-700/60">
-      <div class="text-xs text-slate-400 font-semibold uppercase mb-1">Rol activo (Simulación):</div>
-      <select id="userSelector" class="w-full text-xs bg-slate-900 text-white border border-slate-700 rounded p-1.5 focus:outline-none focus:border-emerald-500">
-        <option value="usr-1">Andrea Mendoza (Administrador)</option>
-        <option value="usr-2" selected>Carlos Ramos (Operador)</option>
-        <option value="usr-3">Lucía Fernández (Cajero)</option>
-      </select>
+      <div class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider mb-1">Sesión Activa</div>
+      <div id="sidebarUserName" class="text-sm font-bold text-white truncate">Usuario</div>
+      <div class="mt-1.5">
+        <span id="sidebarUserRole" class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase">ROL</span>
+      </div>
     </div>
 
     <!-- Menú de Navegación -->
@@ -186,10 +264,15 @@
       </button>
     </nav>
 
-    <!-- Footer info -->
-    <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
-      TECSUP - Laboratorio 13<br>
-      API Mock: <span class="text-emerald-400 font-mono" id="apiStatus">localhost:3000</span>
+    <!-- Footer info y Cerrar Sesión -->
+    <div class="p-3 border-t border-slate-800 space-y-3">
+      <button type="button" id="btnLogout" onclick="cerrarSesion()" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-red-500/10 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/20 hover:border-red-600 text-xs font-bold transition min-h-[40px]">
+        <i data-lucide="log-out" class="w-4 h-4 shrink-0"></i> Cerrar sesión
+      </button>
+      <div class="text-xs text-slate-500 text-center">
+        TECSUP - Laboratorio 13<br>
+        API Mock: <span class="text-emerald-400 font-mono" id="apiStatus">localhost:3000</span>
+      </div>
     </div>
   </aside>
 
@@ -206,7 +289,7 @@
         <span class="mobile-hide-badge px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 shrink-0">API Conectada</span>
       </div>
       <div class="flex items-center gap-3 shrink-0">
-        <span class="text-sm text-slate-600 font-medium truncate" id="userNameLabel">Carlos Ramos Valencia (Operador)</span>
+        <span class="text-sm text-slate-600 font-medium truncate" id="userNameLabel">Usuario</span>
         <button onclick="simulateReload()" class="p-2 rounded-lg hover:bg-slate-100 text-slate-600 transition" title="Refrescar datos">
           <i data-lucide="refresh-cw" class="w-4 h-4"></i>
         </button>
@@ -217,10 +300,12 @@
     <div class="flex-1 overflow-y-auto p-8" id="viewContainer">
       <!-- Dynamic Views Loaded Here -->
     </div>
-
-    <!-- Feedback Toast Notification -->
-    <div id="toast" class="fixed bottom-6 right-6 max-w-md p-4 rounded-xl shadow-2xl flex items-start gap-3 transition-all z-50 hidden"></div>
   </main>
+
+  </div><!-- Fin #appShell -->
+
+  <!-- Feedback Toast Notification (global para Login y App) -->
+  <div id="toast" class="fixed bottom-6 right-6 max-w-md p-4 rounded-xl shadow-2xl flex items-start gap-3 transition-all z-50 hidden"></div>
 
   <!-- Modal Interactivo: Registrar Nuevo Pasajero (Módulo 3) -->
   <div id="modalNuevoPasajero" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto hidden">
