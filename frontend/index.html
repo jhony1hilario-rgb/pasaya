@@ -173,22 +173,22 @@
         <!-- Acceso rápido de demostración -->
         <div class="pt-4 border-t border-slate-100">
           <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider text-center mb-2.5">
-            Acceso rápido · Usuarios de prueba (clave: 123456)
+            Rellenar credenciales de prueba (clave: 123456)
           </p>
           <div class="grid grid-cols-3 gap-2">
-            <button type="button" onclick="loginRapido('pasajero')"
+            <button type="button" onclick="rellenarCredenciales('pasajero')"
               class="p-2 rounded-xl border border-slate-200 hover:border-cyan-500 hover:bg-cyan-50 text-center transition group">
               <i data-lucide="user-check" class="w-4 h-4 text-cyan-600 mx-auto mb-1"></i>
               <span class="block text-xs font-bold text-slate-700 group-hover:text-cyan-700">Pasajero</span>
               <span class="block text-[10px] text-slate-400 truncate">pasajero</span>
             </button>
-            <button type="button" onclick="loginRapido('conductor')"
+            <button type="button" onclick="rellenarCredenciales('conductor')"
               class="p-2 rounded-xl border border-slate-200 hover:border-amber-500 hover:bg-amber-50 text-center transition group">
               <i data-lucide="bus" class="w-4 h-4 text-amber-600 mx-auto mb-1"></i>
               <span class="block text-xs font-bold text-slate-700 group-hover:text-amber-700">Conductor</span>
               <span class="block text-[10px] text-slate-400 truncate">conductor</span>
             </button>
-            <button type="button" onclick="loginRapido('admin')"
+            <button type="button" onclick="rellenarCredenciales('admin')"
               class="p-2 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 text-center transition group">
               <i data-lucide="shield" class="w-4 h-4 text-emerald-600 mx-auto mb-1"></i>
               <span class="block text-xs font-bold text-slate-700 group-hover:text-emerald-700">Admin</span>
@@ -224,13 +224,16 @@
       </button>
     </div>
 
-    <!-- Perfil Autenticado -->
-    <div class="p-4 bg-slate-800/60 m-3 rounded-lg border border-slate-700/60">
-      <div class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider mb-1">Sesión Activa</div>
-      <div id="sidebarUserName" class="text-sm font-bold text-white truncate">Usuario</div>
-      <div class="mt-1.5">
-        <span id="sidebarUserRole" class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase">ROL</span>
+    <!-- Tarjeta de Usuario Autenticado -->
+    <div class="p-4 bg-slate-800/80 m-3 rounded-xl border border-slate-700/80 shadow-sm">
+      <div class="flex items-center justify-between gap-2 mb-1">
+        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Sesión Activa</span>
+        <span id="sidebarUserRole" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase">ROL</span>
       </div>
+      <div id="sidebarUserName" class="text-sm font-bold text-white truncate mb-3">Usuario</div>
+      <button type="button" id="btnLogout" onclick="cerrarSesion()" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-red-500/15 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/30 hover:border-red-600 text-xs font-bold transition min-h-[38px]">
+        <i data-lucide="log-out" class="w-3.5 h-3.5 shrink-0"></i> Cerrar sesión
+      </button>
     </div>
 
     <!-- Menú de Navegación -->
@@ -264,15 +267,10 @@
       </button>
     </nav>
 
-    <!-- Footer info y Cerrar Sesión -->
-    <div class="p-3 border-t border-slate-800 space-y-3">
-      <button type="button" id="btnLogout" onclick="cerrarSesion()" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-red-500/10 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/20 hover:border-red-600 text-xs font-bold transition min-h-[40px]">
-        <i data-lucide="log-out" class="w-4 h-4 shrink-0"></i> Cerrar sesión
-      </button>
-      <div class="text-xs text-slate-500 text-center">
-        TECSUP - Laboratorio 13<br>
-        API Mock: <span class="text-emerald-400 font-mono" id="apiStatus">localhost:3000</span>
-      </div>
+    <!-- Footer info -->
+    <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
+      TECSUP - Laboratorio 13<br>
+      API Mock: <span class="text-emerald-400 font-mono" id="apiStatus">localhost:3000</span>
     </div>
   </aside>
 
