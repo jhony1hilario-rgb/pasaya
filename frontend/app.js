@@ -279,73 +279,127 @@ const Views = {
       ]);
 
       return `
-        <div class="grid-two-columns">
-          <!-- Formulario Simulador de Abordaje -->
-          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
-              <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold shrink-0">
-                <i data-lucide="smartphone-charging" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <h3 class="font-bold text-lg text-slate-800">1. Abordaje: Validador de Bus</h3>
-                <p class="text-xs text-slate-500">Módulo 1: Débito automático al momento de abordar</p>
-              </div>
+        <div class="space-y-6">
+
+          <!-- Selector de Método de Pago -->
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Método de cobro:</p>
+            <div class="flex gap-3 flex-wrap">
+              <button id="btnMetodoTarjeta" onclick="seleccionarMetodoPago('tarjeta')"
+                class="metodo-pago-btn flex-1 min-w-[140px] flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-700 font-bold text-sm transition min-h-[44px]">
+                <i data-lucide="credit-card" class="w-4 h-4"></i> Tarjeta Prepago
+              </button>
+              <button id="btnMetodoQR" onclick="seleccionarMetodoPago('qr')"
+                class="metodo-pago-btn flex-1 min-w-[140px] flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border-2 border-slate-200 bg-white text-slate-600 font-bold text-sm transition min-h-[44px]">
+                <i data-lucide="qr-code" class="w-4 h-4"></i> QR · Yape / Plin
+              </button>
             </div>
-
-            <form id="formAbordaje" class="space-y-4">
-              <div>
-                <label class="block text-xs font-semibold text-slate-600 mb-1">1. Unidad / Bus Operativo:</label>
-                <select id="selUnidad" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:border-emerald-500 focus:outline-none min-h-[44px]">
-                  ${unidades.map(u => `<option value="${u.id}">${u.padron} - Placa: ${u.placa} (Cap: ${u.capacidad_pasajeros})</option>`).join('')}
-                </select>
-              </div>
-
-              <div>
-                <label class="block text-xs font-semibold text-slate-600 mb-1">2. Ruta de Circulación:</label>
-                <select id="selRuta" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:border-emerald-500 focus:outline-none min-h-[44px]">
-                  ${rutas.map(r => `<option value="${r.id}">${r.codigo_ruta}: ${r.nombre}</option>`).join('')}
-                </select>
-              </div>
-
-              <div>
-                <label class="block text-xs font-semibold text-slate-600 mb-1">3. Código de Tarjeta del Pasajero:</label>
-                <div class="flex flex-col sm:flex-row gap-2">
-                  <input type="text" id="txtCodigoTarjeta" value="TARJ-1001" placeholder="Ej. TARJ-1001" class="flex-1 text-sm border border-slate-300 rounded-lg p-2.5 font-mono uppercase focus:border-emerald-500 focus:outline-none min-h-[44px]" required>
-                  <button type="button" onclick="probarTarjetaSinSaldo()" class="px-3 py-2 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium min-h-[44px] flex items-center justify-center shrink-0 transition" title="Cargar tarjeta para simular error 409">
-                    Probar Sin Saldo
-                  </button>
-                </div>
-                <p class="text-xs text-slate-400 mt-1">Escriba el código o seleccione una de las tarjetas activas de prueba.</p>
-              </div>
-
-              <div class="pt-4">
-                <button type="submit" id="btnValidarAbordaje" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 min-h-[48px]">
-                  <i data-lucide="check-circle" class="w-5 h-5"></i> Simular Validación de Abordaje
-                </button>
-              </div>
-            </form>
           </div>
 
-          <!-- Monitor de Validación en Cabina -->
-          <div class="bg-slate-900 text-white p-4 sm:p-6 rounded-2xl shadow-xl flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between pb-4 border-b border-slate-800">
-                <span class="text-xs text-slate-400 uppercase font-mono tracking-widest">Pantalla del Validador a Bordo</span>
-                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-950 text-emerald-400 border border-emerald-800">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Listo
-                </span>
+          <div class="grid-two-columns">
+
+            <!-- Panel Izquierdo: Formulario de Abordaje -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+              <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+                <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold shrink-0">
+                  <i data-lucide="smartphone-charging" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h3 class="font-bold text-lg text-slate-800">1. Abordaje: Validador de Bus</h3>
+                  <p class="text-xs text-slate-500">Módulo 1: Débito automático al momento de abordar</p>
+                </div>
               </div>
 
-              <div id="pantallaValidador" class="my-6 sm:my-8 text-center p-6 sm:p-8 rounded-xl bg-slate-950/60 border border-slate-800 min-h-[160px] sm:min-h-[180px] flex flex-col items-center justify-center">
-                <i data-lucide="wifi" class="w-12 h-12 text-slate-600 mb-3 animate-pulse"></i>
-                <p class="text-slate-400 text-sm">Acerque su tarjeta prepago al lector</p>
-                <p class="text-xs text-slate-600 mt-1">Tarifa General: S/ 1.50 | Estudiante: S/ 0.70</p>
+              <!-- Selector de unidad y ruta (compartido ambos métodos) -->
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">1. Unidad / Bus Operativo:</label>
+                  <select id="selUnidad" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:border-emerald-500 focus:outline-none min-h-[44px]">
+                    ${unidades.map(u => `<option value="${u.id}" data-padron="${u.padron}" data-placa="${u.placa}">${u.padron} - Placa: ${u.placa} (Cap: ${u.capacidad_pasajeros})</option>`).join('')}
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">2. Ruta de Circulación:</label>
+                  <select id="selRuta" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:border-emerald-500 focus:outline-none min-h-[44px]">
+                    ${rutas.map(r => `<option value="${r.id}" data-codigo="${r.codigo_ruta}" data-nombre="${r.nombre}">${r.codigo_ruta}: ${r.nombre}</option>`).join('')}
+                  </select>
+                </div>
+              </div>
+
+              <!-- Formulario Tarjeta Prepago -->
+              <form id="formAbordaje" class="space-y-4 mt-4" data-metodo="tarjeta">
+                <div id="seccionTarjeta">
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">3. Código de Tarjeta del Pasajero:</label>
+                  <div class="flex flex-col sm:flex-row gap-2">
+                    <input type="text" id="txtCodigoTarjeta" value="TARJ-1001" placeholder="Ej. TARJ-1001"
+                      class="flex-1 text-sm border border-slate-300 rounded-lg p-2.5 font-mono uppercase focus:border-emerald-500 focus:outline-none min-h-[44px]" required>
+                    <button type="button" onclick="probarTarjetaSinSaldo()"
+                      class="px-3 py-2 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium min-h-[44px] flex items-center justify-center shrink-0 transition">
+                      Probar Sin Saldo
+                    </button>
+                  </div>
+                  <p class="text-xs text-slate-400 mt-1">Escriba el código de la tarjeta activa de prueba.</p>
+                </div>
+
+                <div class="pt-2">
+                  <button type="submit" id="btnValidarAbordaje"
+                    class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 min-h-[48px]">
+                    <i data-lucide="check-circle" class="w-5 h-5"></i> Simular Validación de Abordaje
+                  </button>
+                </div>
+              </form>
+
+              <!-- Panel de Cobro por QR (oculto por defecto) -->
+              <div id="panelCobroQR" class="hidden mt-4 space-y-4">
+                <div class="p-4 bg-violet-50 border border-violet-200 rounded-xl text-center">
+                  <div class="flex items-center justify-center gap-2 mb-1">
+                    <i data-lucide="qr-code" class="w-5 h-5 text-violet-600"></i>
+                    <span class="font-bold text-violet-800 text-sm">Escanee con Yape, Plin u otra billetera</span>
+                  </div>
+                  <p class="text-xs text-violet-600 mt-1" id="qrRefTexto">Seleccione unidad y ruta, luego genere el QR</p>
+                </div>
+
+                <div class="flex flex-col items-center gap-3 p-5 bg-white border-2 border-dashed border-violet-200 rounded-2xl">
+                  <canvas id="canvasQRPasaYa" class="rounded-xl shadow" style="max-width:200px;width:100%"></canvas>
+                  <div id="qrMontoDisplay" class="text-2xl font-black text-slate-800 mt-1"></div>
+                  <p class="text-xs text-slate-500 text-center" id="qrDetalleDisplay"></p>
+                </div>
+
+                <div class="flex gap-2">
+                  <button type="button" onclick="generarCobroQR()"
+                    class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm rounded-xl transition min-h-[44px]">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> Nuevo QR
+                  </button>
+                  <button type="button" onclick="confirmarPagoQR()"
+                    class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 bg-violet-600 hover:bg-violet-700 text-white font-bold text-sm rounded-xl shadow transition min-h-[44px]">
+                    <i data-lucide="check-circle-2" class="w-4 h-4"></i> Confirmar pago QR
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div class="p-3 bg-slate-800/80 rounded-lg text-xs text-slate-400">
-              💡 <strong>Regla de negocio:</strong> Si el saldo es menor a la tarifa, la API devuelve HTTP 409 <em>(Conflict: Saldo insuficiente)</em> y la pantalla cambia a rojo emitiendo señal de cobro denegado.
+            <!-- Panel Derecho: Monitor del Validador -->
+            <div class="bg-slate-900 text-white p-4 sm:p-6 rounded-2xl shadow-xl flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                  <span class="text-xs text-slate-400 uppercase font-mono tracking-widest">Pantalla del Validador a Bordo</span>
+                  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-950 text-emerald-400 border border-emerald-800">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Listo
+                  </span>
+                </div>
+
+                <div id="pantallaValidador" class="my-6 sm:my-8 text-center p-6 sm:p-8 rounded-xl bg-slate-950/60 border border-slate-800 min-h-[160px] sm:min-h-[180px] flex flex-col items-center justify-center">
+                  <i data-lucide="wifi" class="w-12 h-12 text-slate-600 mb-3 animate-pulse"></i>
+                  <p class="text-slate-400 text-sm">Acerque su tarjeta prepago al lector</p>
+                  <p class="text-xs text-slate-600 mt-1">Tarifa General: S/ 1.50 | Estudiante: S/ 0.70</p>
+                </div>
+              </div>
+
+              <div class="p-3 bg-slate-800/80 rounded-lg text-xs text-slate-400">
+                💡 <strong>Regla de negocio:</strong> Si el saldo es menor a la tarifa, la API devuelve HTTP 409 <em>(Conflict: Saldo insuficiente)</em>. Con QR se muestra confirmación visual inmediata.
+              </div>
             </div>
+
           </div>
         </div>
       `;
@@ -794,6 +848,9 @@ async function navigate(viewName) {
 
 function attachViewHandlers(viewName) {
   if (viewName === 'abordaje') {
+    // Inicializar con método tarjeta activo
+    seleccionarMetodoPago('tarjeta');
+
     const form = document.getElementById('formAbordaje');
     if (form) {
       form.onsubmit = async (e) => {
@@ -864,7 +921,193 @@ function attachViewHandlers(viewName) {
 }
 
 // ------------------------------------------------------------------------------
-// 5. GESTIÓN DE MODAL Y REGISTRO DE NUEVO PASAJERO (P1)
+// 5. COBRO POR QR · YAPE / PLIN / BILLETERAS DIGITALES
+// ------------------------------------------------------------------------------
+
+// Estado interno del QR activo (se renueva cada vez que se genera)
+let _qrOperacionActual = null;
+
+/**
+ * Alterna entre el método de pago por TARJETA y por QR.
+ * Actualiza botones y paneles sin recargar la vista.
+ */
+function seleccionarMetodoPago(metodo) {
+  const btnTarjeta    = document.getElementById('btnMetodoTarjeta');
+  const btnQR         = document.getElementById('btnMetodoQR');
+  const secTarjeta    = document.getElementById('seccionTarjeta');
+  const panelQR       = document.getElementById('panelCobroQR');
+  const btnValidar    = document.getElementById('btnValidarAbordaje');
+
+  if (!btnTarjeta || !btnQR) return;
+
+  if (metodo === 'tarjeta') {
+    // Activar tarjeta
+    btnTarjeta.className = 'metodo-pago-btn flex-1 min-w-[140px] flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-700 font-bold text-sm transition min-h-[44px]';
+    btnQR.className      = 'metodo-pago-btn flex-1 min-w-[140px] flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border-2 border-slate-200 bg-white text-slate-600 font-bold text-sm transition min-h-[44px]';
+    if (secTarjeta) secTarjeta.classList.remove('hidden');
+    if (panelQR)    panelQR.classList.add('hidden');
+    if (btnValidar) btnValidar.classList.remove('hidden');
+  } else {
+    // Activar QR
+    btnTarjeta.className = 'metodo-pago-btn flex-1 min-w-[140px] flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border-2 border-slate-200 bg-white text-slate-600 font-bold text-sm transition min-h-[44px]';
+    btnQR.className      = 'metodo-pago-btn flex-1 min-w-[140px] flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border-2 border-violet-500 bg-violet-50 text-violet-700 font-bold text-sm transition min-h-[44px]';
+    if (secTarjeta) secTarjeta.classList.add('hidden');
+    if (panelQR)    panelQR.classList.remove('hidden');
+    if (btnValidar) btnValidar.classList.add('hidden');
+    generarCobroQR();
+  }
+}
+
+/**
+ * Genera el código QR con los datos actuales de unidad, ruta y tarifa.
+ * Actualiza #canvasQRPasaYa, #qrMontoDisplay y #qrDetalleDisplay.
+ */
+async function generarCobroQR() {
+  const selUnidad = document.getElementById('selUnidad');
+  const selRuta   = document.getElementById('selRuta');
+  const canvas    = document.getElementById('canvasQRPasaYa');
+
+  if (!selUnidad || !selRuta || !canvas) return;
+
+  const unidadOpt  = selUnidad.options[selUnidad.selectedIndex];
+  const rutaOpt    = selRuta.options[selRuta.selectedIndex];
+  const unidad_id  = selUnidad.value;
+  const ruta_id    = selRuta.value;
+  const padron     = unidadOpt.dataset.padron || unidadOpt.text.split(' - ')[0];
+  const rutaTexto  = rutaOpt.dataset.nombre   || rutaOpt.text;
+  const codigoRuta = rutaOpt.dataset.codigo   || rutaOpt.text.split(':')[0];
+
+  // Tarifa general por defecto (sin tarjeta)
+  let tarifa = 1.50;
+  try {
+    const tarifas = await ApiService.get(`tarifas?ruta_id=${ruta_id}&tipo_pasajero=general&estado=vigente`);
+    if (tarifas && tarifas.length > 0) tarifa = tarifas[0].monto;
+  } catch (_) { /* usar tarifa por defecto */ }
+
+  const opId = `PY-QR-${Date.now().toString(36).toUpperCase()}`;
+  _qrOperacionActual = { unidad_id, ruta_id, padron, rutaTexto, codigoRuta, tarifa, opId };
+
+  // Contenido del QR (URL de pago genérica + datos del cobro)
+  const contenidoQR = [
+    `PASAYA|COBRO`,
+    `OP=${opId}`,
+    `UNIDAD=${padron}`,
+    `RUTA=${codigoRuta}`,
+    `MONTO=${tarifa.toFixed(2)}`,
+    `MONEDA=PEN`,
+    `CONCEPTO=Pasaje+Urbano+Arequipa`
+  ].join('|');
+
+  try {
+    await QRCode.toCanvas(canvas, contenidoQR, {
+      width: 200,
+      margin: 2,
+      color: { dark: '#1e1b4b', light: '#ffffff' }
+    });
+  } catch (qrErr) {
+    console.error('QR generation error:', qrErr);
+    return;
+  }
+
+  // Actualizar textos del panel
+  const montoEl   = document.getElementById('qrMontoDisplay');
+  const detalleEl = document.getElementById('qrDetalleDisplay');
+  const refEl     = document.getElementById('qrRefTexto');
+
+  if (montoEl)   montoEl.textContent   = `S/ ${tarifa.toFixed(2)}`;
+  if (detalleEl) detalleEl.textContent = `${padron} · ${codigoRuta}: ${rutaTexto}`;
+  if (refEl)     refEl.textContent     = `Ref: ${opId} · Escanee con Yape, Plin u otra billetera`;
+
+  lucide.createIcons();
+}
+
+/**
+ * Confirma el pago QR, registra el viaje y el evento de auditoría,
+ * y actualiza el monitor del validador en la pantalla.
+ */
+async function confirmarPagoQR() {
+  if (!_qrOperacionActual) {
+    showToast('Primero genere un código QR.', 'error');
+    return;
+  }
+
+  const { unidad_id, ruta_id, padron, codigoRuta, tarifa, opId } = _qrOperacionActual;
+  const pantalla = document.getElementById('pantallaValidador');
+
+  if (pantalla) {
+    pantalla.innerHTML = `<i data-lucide="loader" class="w-10 h-10 animate-spin text-violet-400 my-4"></i><p class="text-violet-300 text-sm mt-2">Confirmando pago QR...</p>`;
+    lucide.createIcons();
+  }
+
+  try {
+    // Registrar viaje con método QR (sin débito de tarjeta)
+    const viajeQR = await ApiService.post('viajes', {
+      id: `vj-qr-${Date.now()}`,
+      tarjeta_id: null,
+      codigo_tarjeta: `QR-${opId}`,
+      unidad_id,
+      ruta_id,
+      tarifa_monto: tarifa,
+      saldo_anterior: null,
+      saldo_posterior: null,
+      metodo_pago: 'qr',
+      referencia_qr: opId,
+      fecha_hora: new Date().toISOString(),
+      estado: 'exitoso'
+    });
+
+    // Registrar en auditoría
+    try {
+      await ApiService.post('auditoria', {
+        id: `aud-qr-${Date.now()}`,
+        usuario_id: currentUser.id,
+        accion: 'COBRO_QR',
+        entidad: 'viaje',
+        entidad_id: viajeQR.id,
+        detalles: { opId, unidad_id, ruta_id, tarifa, metodo: 'QR · Yape/Plin' },
+        ip_origen: '127.0.0.1',
+        fecha_hora: new Date().toISOString()
+      });
+    } catch (_) { /* auditoría no crítica */ }
+
+    // Actualizar pantalla del validador
+    if (pantalla) {
+      pantalla.innerHTML = `
+        <div class="p-4 bg-violet-950/80 border border-violet-400 rounded-xl">
+          <i data-lucide="check-circle-2" class="w-14 h-14 text-violet-300 mx-auto mb-2"></i>
+          <h3 class="text-xl font-black text-violet-200">PAGO QR CONFIRMADO</h3>
+          <p class="text-xs text-slate-300 mt-1 font-mono">${opId}</p>
+          <p class="text-2xl font-black text-white mt-2">S/ ${tarifa.toFixed(2)}</p>
+          <p class="text-xs text-violet-300 mt-1">Yape · Plin · Billetera Digital</p>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    showToast(`Pago QR confirmado. Ref: ${opId} · S/ ${tarifa.toFixed(2)}`, 'success');
+
+    // Limpiar estado y regenerar nuevo QR para el siguiente pasajero
+    _qrOperacionActual = null;
+    setTimeout(() => generarCobroQR(), 3500);
+
+  } catch (err) {
+    console.error('Error al confirmar pago QR:', err);
+    showToast('Error al registrar el cobro QR. Intente de nuevo.', 'error');
+    if (pantalla) {
+      pantalla.innerHTML = `
+        <div class="p-4 bg-red-950/80 border border-red-500 rounded-xl">
+          <i data-lucide="x-circle" class="w-14 h-14 text-red-500 mx-auto mb-2"></i>
+          <h3 class="text-xl font-black text-red-400">ERROR QR</h3>
+          <p class="text-xs text-slate-200 mt-1">No se pudo registrar el cobro.</p>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+  }
+}
+
+// ------------------------------------------------------------------------------
+// 6. GESTIÓN DE MODAL Y REGISTRO DE NUEVO PASAJERO
 // ------------------------------------------------------------------------------
 async function abrirModalPasajero() {
   const modal = document.getElementById('modalNuevoPasajero');
