@@ -339,7 +339,7 @@ function cerrarModalRegistroUsuario() {
 async function guardarNuevoUsuario(e) {
   if (e) e.preventDefault();
 
-  const nombres = document.getElementById('txtRegNombres').value.trim();
+  const nombresRaw = document.getElementById('txtRegNombres').value.trim();
   const usuario = document.getElementById('txtRegUsuario').value.trim().toLowerCase();
   const email = document.getElementById('txtRegEmail').value.trim().toLowerCase();
   const password = document.getElementById('txtRegPassword').value.trim();
@@ -348,7 +348,7 @@ async function guardarNuevoUsuario(e) {
   const errBox = document.getElementById('registroError');
   const errText = document.getElementById('registroErrorText');
 
-  if (!nombres || !usuario || !email || !password || !rol) {
+  if (!nombresRaw || !usuario || !email || !password || !rol) {
     if (errBox && errText) {
       errText.textContent = 'Por favor complete todos los campos obligatorios.';
       errBox.classList.remove('hidden');
@@ -373,16 +373,6 @@ async function guardarNuevoUsuario(e) {
     return;
   }
 
-  // Verificar si ya existe en memoria local
-  const yaExisteLocal = USUARIOS_SISTEMA.some(u => u.usuario === usuario || u.email === email);
-  if (yaExisteLocal) {
-    if (errBox && errText) {
-      errText.textContent = `El usuario "${usuario}" o el correo "${email}" ya se encuentra registrado.`;
-      errBox.classList.remove('hidden');
-    }
-    return;
-  }
-
   if (btnGuardar) {
     btnGuardar.disabled = true;
     btnGuardar.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Registrando...`;
@@ -390,32 +380,50 @@ async function guardarNuevoUsuario(e) {
   }
 
   try {
-    // Validar duplicidad en la API mock (/usuarios)
+    // 1. Validar duplicidad consultando los usuarios actuales en la API mock (${API_BASE_URL}/usuarios)
+    let usuariosApi = [];
     try {
-      const [porEmail, porUser] = await Promise.all([
-        ApiService.get(`usuarios?email=${encodeURIComponent(email)}`),
-        ApiService.get(`usuarios?usuario=${encodeURIComponent(usuario)}`)
-      ]);
-      if ((Array.isArray(porEmail) && porEmail.length > 0) || (Array.isArray(porUser) && porUser.length > 0)) {
-        if (errBox && errText) {
-          errText.textContent = `El usuario o correo ya está registrado en el servidor.`;
-          errBox.classList.remove('hidden');
-        }
-        if (btnGuardar) {
-          btnGuardar.disabled = false;
-          btnGuardar.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Registrar Usuario`;
-          if (window.lucide) lucide.createIcons();
-        }
-        return;
+      const dataApi = await ApiService.get('usuarios');
+      if (Array.isArray(dataApi)) {
+        usuariosApi = dataApi;
       }
-    } catch (_) { /* continuar con creación */ }
+    } catch (errConexion) {
+      console.error('Error de red al consultar API mock:', errConexion);
+      if (errBox && errText) {
+        errText.textContent = 'No se pudo conectar con la API del servidor (json-server en puerto 3000). Verifique que el servicio esté activo para registrar usuarios.';
+        errBox.classList.remove('hidden');
+      }
+      showToast('Error de conexión con la API mock.', 'error');
+      return;
+    }
 
-    // Payload para json-server (/usuarios)
+    const universoValidacion = [...usuariosApi.map(normalizarPerfilUsuario), ...USUARIOS_SISTEMA];
+    const yaExiste = universoValidacion.some(u => {
+      const uUser = (u.usuario || (u.email ? u.email.split('@')[0] : '')).trim().toLowerCase();
+      const uEmail = (u.email || '').trim().toLowerCase();
+      return uUser === usuario || uEmail === email;
+    });
+
+    if (yaExiste) {
+      if (errBox && errText) {
+        errText.textContent = `El usuario "${usuario}" o el correo "${email}" ya se encuentra registrado.`;
+        errBox.classList.remove('hidden');
+      }
+      return;
+    }
+
+    // Separar nombres y apellidos para esquema completo
+    const partes = nombresRaw.split(' ');
+    const soloNombres = partes[0] || nombresRaw;
+    const soloApellidos = partes.slice(1).join(' ') || '';
+
+    // 2. Payload completo para json-server (/usuarios)
     const nuevoId = `usr-${Date.now()}`;
     const payloadUsuario = {
       id: nuevoId,
+      nombres: nombresRaw,
+      apellidos: soloApellidos,
       usuario,
-      nombres,
       email,
       password,
       rol,
@@ -423,14 +431,48 @@ async function guardarNuevoUsuario(e) {
       fecha_creacion: new Date().toISOString()
     };
 
-    // Guardar en la API mock
+    // Guardar usuario de forma persistente en la API mock
     await ApiService.post('usuarios', payloadUsuario);
 
-    // Integrar el nuevo perfil a la sesión del frontend
+    // 3. Si el usuario es 'pasajero', crear automáticamente su registro en /pasajeros y tarjeta inicial en /tarjetas
+    let codigoTarjetaAsignada = '';
+    if (rol === 'pasajero') {
+      try {
+        const nuevoIdPasajero = `pas-${Date.now()}`;
+        const nuevoPasajero = await ApiService.post('pasajeros', {
+          id: nuevoIdPasajero,
+          usuario_id: nuevoId,
+          tipo_documento: 'DNI',
+          numero_documento: `${Math.floor(10000000 + Math.random() * 90000000)}`,
+          nombres: soloNombres,
+          apellidos: soloApellidos || 'PasaYa',
+          telefono: '',
+          email: email,
+          tipo_tarifa: 'general',
+          estado: 'activo'
+        });
+
+        const randNum = Math.floor(1000 + Math.random() * 9000);
+        codigoTarjetaAsignada = `TARJ-${randNum}`;
+        await ApiService.post('tarjetas', {
+          id: `tar-${Date.now()}`,
+          codigo_tarjeta: codigoTarjetaAsignada,
+          pasajero_id: nuevoPasajero.id,
+          tipo_tarifa: 'general',
+          saldo: 0.00,
+          estado: 'activa',
+          fecha_emision: new Date().toISOString()
+        });
+      } catch (errPasajero) {
+        console.warn('Advertencia al vincular pasajero y tarjeta:', errPasajero);
+      }
+    }
+
+    // 4. Integrar el nuevo perfil a la memoria del sistema
     const perfilNormalizado = normalizarPerfilUsuario(payloadUsuario);
     USUARIOS_SISTEMA.push(perfilNormalizado);
 
-    // Registrar evento de auditoría
+    // 5. Registrar evento de auditoría
     try {
       await ApiService.post('auditoria', {
         id: `aud-${Date.now()}`,
@@ -438,16 +480,20 @@ async function guardarNuevoUsuario(e) {
         accion: 'REGISTRO_USUARIO',
         entidad: 'usuario',
         entidad_id: nuevoId,
-        detalles: { usuario, email, rol, nombres },
+        detalles: { usuario, email, rol, nombres: nombresRaw, tarjeta: codigoTarjetaAsignada || 'N/A' },
         ip_origen: '127.0.0.1',
         fecha_hora: new Date().toISOString()
       });
     } catch (_) { /* auditoría no crítica */ }
 
+    // 6. Cerrar modal y notificar éxito
     cerrarModalRegistroUsuario();
-    showToast(`¡Usuario ${usuario} creado exitosamente! Ya puedes iniciar sesión.`, 'success');
+    const mensajeExito = codigoTarjetaAsignada
+      ? `¡Usuario ${usuario} creado exitosamente con tarjeta ${codigoTarjetaAsignada} (Saldo: S/ 0.00)! Ya puedes iniciar sesión.`
+      : `¡Usuario ${usuario} creado exitosamente! Ya puedes iniciar sesión.`;
+    showToast(mensajeExito, 'success');
 
-    // Autocompletar el formulario de inicio de sesión con los datos registrados
+    // 7. Autocompletar el formulario de inicio de sesión con las credenciales recién creadas
     const txtLoginUser = document.getElementById('txtLoginUsuario');
     const txtLoginPass = document.getElementById('txtLoginPassword');
     if (txtLoginUser) txtLoginUser.value = usuario;
@@ -457,9 +503,10 @@ async function guardarNuevoUsuario(e) {
   } catch (err) {
     console.error('Error al registrar usuario en la API:', err);
     if (errBox && errText) {
-      errText.textContent = 'Error al registrar el usuario en la API mock. Verifique la conexión.';
+      errText.textContent = 'No se pudo conectar con la API del servidor (json-server en puerto 3000). Verifique que el servicio esté activo para guardar de forma persistente.';
       errBox.classList.remove('hidden');
     }
+    showToast('Error de red: no se pudo guardar en la API mock.', 'error');
   } finally {
     if (btnGuardar) {
       btnGuardar.disabled = false;
@@ -504,7 +551,7 @@ async function guardarNuevoAdmin(e) {
     return;
   }
 
-  const nombres = document.getElementById('txtAdminNombres').value.trim();
+  const nombresRaw = document.getElementById('txtAdminNombres').value.trim();
   const usuario = document.getElementById('txtAdminUsuario').value.trim().toLowerCase();
   const email = document.getElementById('txtAdminEmail').value.trim().toLowerCase();
   const password = document.getElementById('txtAdminPassword').value.trim();
@@ -512,7 +559,7 @@ async function guardarNuevoAdmin(e) {
   const errBox = document.getElementById('registroAdminError');
   const errText = document.getElementById('registroAdminErrorText');
 
-  if (!nombres || !usuario || !email || !password) {
+  if (!nombresRaw || !usuario || !email || !password) {
     if (errBox && errText) {
       errText.textContent = 'Por favor complete todos los campos obligatorios.';
       errBox.classList.remove('hidden');
@@ -528,16 +575,6 @@ async function guardarNuevoAdmin(e) {
     return;
   }
 
-  // Verificar si ya existe en memoria local
-  const yaExisteLocal = USUARIOS_SISTEMA.some(u => u.usuario === usuario || u.email === email);
-  if (yaExisteLocal) {
-    if (errBox && errText) {
-      errText.textContent = `El usuario "${usuario}" o el correo "${email}" ya se encuentra registrado.`;
-      errBox.classList.remove('hidden');
-    }
-    return;
-  }
-
   if (btnGuardar) {
     btnGuardar.disabled = true;
     btnGuardar.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Registrando...`;
@@ -545,32 +582,50 @@ async function guardarNuevoAdmin(e) {
   }
 
   try {
-    // Validar duplicidad en la API mock (/usuarios)
+    // 1. Validar duplicidad consultando los usuarios actuales en la API mock (${API_BASE_URL}/usuarios)
+    let usuariosApi = [];
     try {
-      const [porEmail, porUser] = await Promise.all([
-        ApiService.get(`usuarios?email=${encodeURIComponent(email)}`),
-        ApiService.get(`usuarios?usuario=${encodeURIComponent(usuario)}`)
-      ]);
-      if ((Array.isArray(porEmail) && porEmail.length > 0) || (Array.isArray(porUser) && porUser.length > 0)) {
-        if (errBox && errText) {
-          errText.textContent = `El usuario o correo ya está registrado en el servidor.`;
-          errBox.classList.remove('hidden');
-        }
-        if (btnGuardar) {
-          btnGuardar.disabled = false;
-          btnGuardar.innerHTML = `<i data-lucide="shield-check" class="w-4 h-4"></i> Crear Administrador`;
-          if (window.lucide) lucide.createIcons();
-        }
-        return;
+      const dataApi = await ApiService.get('usuarios');
+      if (Array.isArray(dataApi)) {
+        usuariosApi = dataApi;
       }
-    } catch (_) { /* continuar con creación */ }
+    } catch (errConexion) {
+      console.error('Error de red al consultar API mock:', errConexion);
+      if (errBox && errText) {
+        errText.textContent = 'No se pudo conectar con la API del servidor (json-server en puerto 3000). Verifique que el servicio esté activo para registrar administradores.';
+        errBox.classList.remove('hidden');
+      }
+      showToast('Error de conexión con la API mock.', 'error');
+      return;
+    }
 
-    // Payload para json-server (/usuarios) asignando rol administrador
+    const universoValidacion = [...usuariosApi.map(normalizarPerfilUsuario), ...USUARIOS_SISTEMA];
+    const yaExiste = universoValidacion.some(u => {
+      const uUser = (u.usuario || (u.email ? u.email.split('@')[0] : '')).trim().toLowerCase();
+      const uEmail = (u.email || '').trim().toLowerCase();
+      return uUser === usuario || uEmail === email;
+    });
+
+    if (yaExiste) {
+      if (errBox && errText) {
+        errText.textContent = `El usuario "${usuario}" o el correo "${email}" ya se encuentra registrado.`;
+        errBox.classList.remove('hidden');
+      }
+      return;
+    }
+
+    // Separar nombres y apellidos
+    const partes = nombresRaw.split(' ');
+    const soloNombres = partes[0] || nombresRaw;
+    const soloApellidos = partes.slice(1).join(' ') || '';
+
+    // 2. Payload para json-server (/usuarios) asignando rol administrador
     const nuevoId = `usr-admin-${Date.now()}`;
     const payloadUsuario = {
       id: nuevoId,
+      nombres: nombresRaw,
+      apellidos: soloApellidos,
       usuario,
-      nombres,
       email,
       password,
       rol: 'administrador',
@@ -578,7 +633,7 @@ async function guardarNuevoAdmin(e) {
       fecha_creacion: new Date().toISOString()
     };
 
-    // Guardar en la API mock
+    // Guardar en la API mock de forma persistente
     await ApiService.post('usuarios', payloadUsuario);
 
     // Integrar a la lista de perfiles en memoria
@@ -596,7 +651,7 @@ async function guardarNuevoAdmin(e) {
         detalles: {
           nuevo_admin: usuario,
           email,
-          nombres,
+          nombres: nombresRaw,
           creado_por: currentUser.usuario
         },
         ip_origen: '127.0.0.1',
@@ -615,9 +670,10 @@ async function guardarNuevoAdmin(e) {
   } catch (err) {
     console.error('Error al registrar administrador en la API:', err);
     if (errBox && errText) {
-      errText.textContent = 'Error al registrar el administrador en la API mock. Verifique la conexión.';
+      errText.textContent = 'No se pudo conectar con la API del servidor (json-server en puerto 3000). Verifique que el servicio esté activo para guardar de forma persistente.';
       errBox.classList.remove('hidden');
     }
+    showToast('Error de red: no se pudo guardar en la API mock.', 'error');
   } finally {
     if (btnGuardar) {
       btnGuardar.disabled = false;
