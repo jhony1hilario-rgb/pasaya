@@ -66,6 +66,76 @@ let currentView = null;
 // ------------------------------------------------------------------------------
 // 0. AUTENTICACIÓN Y CONTROL DE ACCESO POR ROL
 // ------------------------------------------------------------------------------
+function normalizarPerfilUsuario(u) {
+  const rolRaw = (u.rol || 'pasajero').toLowerCase();
+  let rol = 'pasajero';
+  let rolLabel = 'Pasajero';
+  let defaultView = 'recargas';
+  let allowedViews = ['recargas', 'recarga', 'reposicion', 'flota'];
+
+  if (rolRaw === 'conductor' || rolRaw === 'operador') {
+    rol = 'conductor';
+    rolLabel = 'Conductor';
+    defaultView = 'abordaje';
+    allowedViews = ['abordaje', 'pasajeros', 'recaudacion', 'liquidaciones', 'flota'];
+  } else if (rolRaw === 'administrador' || rolRaw === 'admin') {
+    rol = 'administrador';
+    rolLabel = 'Administrador';
+    defaultView = 'dashboard';
+    allowedViews = [
+      'dashboard',
+      'abordaje',
+      'recargas',
+      'recarga',
+      'pasajeros',
+      'recaudacion',
+      'reposicion',
+      'liquidaciones',
+      'flota',
+      'auditoria'
+    ];
+  }
+
+  const nombres = u.nombres
+    ? (u.apellidos ? `${u.nombres} ${u.apellidos}` : u.nombres)
+    : (u.usuario || 'Usuario PasaYa');
+
+  return {
+    id: u.id || `usr-${Date.now()}`,
+    usuario: (u.usuario || (u.email ? u.email.split('@')[0] : 'usuario')).toLowerCase(),
+    email: (u.email || '').toLowerCase(),
+    password: u.password || '123456',
+    nombres,
+    rol,
+    rolLabel,
+    defaultView,
+    allowedViews
+  };
+}
+
+async function cargarUsuariosRemotos() {
+  try {
+    const remotos = await ApiService.get('usuarios');
+    if (Array.isArray(remotos)) {
+      remotos.forEach(u => {
+        const uNorm = normalizarPerfilUsuario(u);
+        const idx = USUARIOS_SISTEMA.findIndex(local =>
+          local.id === uNorm.id ||
+          local.usuario === uNorm.usuario ||
+          (local.email && uNorm.email && local.email === uNorm.email)
+        );
+        if (idx === -1) {
+          USUARIOS_SISTEMA.push(uNorm);
+        } else if (u.password) {
+          USUARIOS_SISTEMA[idx].password = u.password;
+        }
+      });
+    }
+  } catch (err) {
+    console.warn('No se pudieron precargar usuarios de la API mock:', err);
+  }
+}
+
 function obtenerSesionGuardada() {
   try {
     const raw = localStorage.getItem(AUTH_STORAGE_KEY);
@@ -145,22 +215,48 @@ function mostrarApp(user) {
   navigate(user.defaultView);
 }
 
-function iniciarSesion(identificador, password) {
+async function iniciarSesion(identificador, password) {
   const limpio = (identificador || '').trim().toLowerCase();
   const passLimpio = (password || '').trim();
 
-  const user = USUARIOS_SISTEMA.find(u => {
-    const coincideUsuario = u.usuario === limpio || u.email.toLowerCase() === limpio;
-    if (!coincideUsuario) return false;
+  // 1. Buscar en memoria local
+  let user = USUARIOS_SISTEMA.find(u => {
+    const coincide = u.usuario === limpio || u.email.toLowerCase() === limpio;
+    if (!coincide) return false;
     return passLimpio === u.password || passLimpio === '123456' || passLimpio === `${u.usuario}123` || passLimpio === u.usuario;
   });
+
+  // 2. Si no se encuentra en memoria, consultar la API mock
+  if (!user) {
+    try {
+      const [porEmail, porUser] = await Promise.all([
+        ApiService.get(`usuarios?email=${encodeURIComponent(limpio)}`),
+        ApiService.get(`usuarios?usuario=${encodeURIComponent(limpio)}`)
+      ]);
+      let candidato = (Array.isArray(porEmail) && porEmail.length > 0) ? porEmail[0] : null;
+      if (!candidato && Array.isArray(porUser) && porUser.length > 0) {
+        candidato = porUser[0];
+      }
+      if (candidato) {
+        const passValido = !candidato.password ||
+                           candidato.password === passLimpio ||
+                           passLimpio === '123456' ||
+                           passLimpio === `${candidato.usuario}123` ||
+                           passLimpio === candidato.usuario;
+        if (passValido) {
+          user = normalizarPerfilUsuario(candidato);
+          USUARIOS_SISTEMA.push(user);
+        }
+      }
+    } catch (_) { /* continuar con error de autenticación */ }
+  }
 
   const loginError = document.getElementById('loginError');
   const loginErrorText = document.getElementById('loginErrorText');
 
   if (!user) {
     if (loginError) loginError.classList.remove('hidden');
-    if (loginErrorText) loginErrorText.textContent = 'Credenciales inválidas. Verifique su usuario/correo y contraseña.';
+    if (loginErrorText) loginErrorText.textContent = 'Usuario o contraseña incorrectos.';
     return false;
   }
 
@@ -170,17 +266,147 @@ function iniciarSesion(identificador, password) {
   return true;
 }
 
-function rellenarCredenciales(rolClave) {
-  const user = USUARIOS_SISTEMA.find(u => u.usuario === rolClave || u.rol === rolClave);
-  if (!user) return;
-  const txtUser = document.getElementById('txtLoginUsuario');
-  const txtPass = document.getElementById('txtLoginPassword');
-  if (txtUser) txtUser.value = user.usuario;
-  if (txtPass) txtPass.value = user.password;
-  iniciarSesion(user.usuario, user.password);
+function abrirModalRegistroUsuario() {
+  const modal = document.getElementById('modalRegistroUsuario');
+  if (!modal) return;
+  const form = document.getElementById('formRegistroUsuario');
+  if (form) form.reset();
+  const errBox = document.getElementById('registroError');
+  if (errBox) errBox.classList.add('hidden');
+  modal.classList.remove('hidden');
+  const txtNombres = document.getElementById('txtRegNombres');
+  if (txtNombres) txtNombres.focus();
+  if (window.lucide) lucide.createIcons();
 }
 
-const loginRapido = rellenarCredenciales;
+function cerrarModalRegistroUsuario() {
+  const modal = document.getElementById('modalRegistroUsuario');
+  if (modal) modal.classList.add('hidden');
+}
+
+async function guardarNuevoUsuario(e) {
+  if (e) e.preventDefault();
+
+  const nombres = document.getElementById('txtRegNombres').value.trim();
+  const usuario = document.getElementById('txtRegUsuario').value.trim().toLowerCase();
+  const email = document.getElementById('txtRegEmail').value.trim().toLowerCase();
+  const password = document.getElementById('txtRegPassword').value.trim();
+  const rol = document.getElementById('selRegRol').value;
+  const btnGuardar = document.getElementById('btnGuardarUsuario');
+  const errBox = document.getElementById('registroError');
+  const errText = document.getElementById('registroErrorText');
+
+  if (!nombres || !usuario || !email || !password || !rol) {
+    if (errBox && errText) {
+      errText.textContent = 'Por favor complete todos los campos obligatorios.';
+      errBox.classList.remove('hidden');
+    }
+    return;
+  }
+
+  if (password.length < 4) {
+    if (errBox && errText) {
+      errText.textContent = 'La contraseña debe tener al menos 4 caracteres.';
+      errBox.classList.remove('hidden');
+    }
+    return;
+  }
+
+  // Verificar si ya existe en memoria local
+  const yaExisteLocal = USUARIOS_SISTEMA.some(u => u.usuario === usuario || u.email === email);
+  if (yaExisteLocal) {
+    if (errBox && errText) {
+      errText.textContent = `El usuario "${usuario}" o el correo "${email}" ya se encuentra registrado.`;
+      errBox.classList.remove('hidden');
+    }
+    return;
+  }
+
+  if (btnGuardar) {
+    btnGuardar.disabled = true;
+    btnGuardar.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Registrando...`;
+    if (window.lucide) lucide.createIcons();
+  }
+
+  try {
+    // Validar duplicidad en la API mock (/usuarios)
+    try {
+      const [porEmail, porUser] = await Promise.all([
+        ApiService.get(`usuarios?email=${encodeURIComponent(email)}`),
+        ApiService.get(`usuarios?usuario=${encodeURIComponent(usuario)}`)
+      ]);
+      if ((Array.isArray(porEmail) && porEmail.length > 0) || (Array.isArray(porUser) && porUser.length > 0)) {
+        if (errBox && errText) {
+          errText.textContent = `El usuario o correo ya está registrado en el servidor.`;
+          errBox.classList.remove('hidden');
+        }
+        if (btnGuardar) {
+          btnGuardar.disabled = false;
+          btnGuardar.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Registrar Usuario`;
+          if (window.lucide) lucide.createIcons();
+        }
+        return;
+      }
+    } catch (_) { /* continuar con creación */ }
+
+    // Payload para json-server (/usuarios)
+    const nuevoId = `usr-${Date.now()}`;
+    const payloadUsuario = {
+      id: nuevoId,
+      usuario,
+      nombres,
+      email,
+      password,
+      rol,
+      estado: 'activo',
+      fecha_creacion: new Date().toISOString()
+    };
+
+    // Guardar en la API mock
+    await ApiService.post('usuarios', payloadUsuario);
+
+    // Integrar el nuevo perfil a la sesión del frontend
+    const perfilNormalizado = normalizarPerfilUsuario(payloadUsuario);
+    USUARIOS_SISTEMA.push(perfilNormalizado);
+
+    // Registrar evento de auditoría
+    try {
+      await ApiService.post('auditoria', {
+        id: `aud-${Date.now()}`,
+        usuario_id: nuevoId,
+        accion: 'REGISTRO_USUARIO',
+        entidad: 'usuario',
+        entidad_id: nuevoId,
+        detalles: { usuario, email, rol, nombres },
+        ip_origen: '127.0.0.1',
+        fecha_hora: new Date().toISOString()
+      });
+    } catch (_) { /* auditoría no crítica */ }
+
+    cerrarModalRegistroUsuario();
+    showToast(`¡Usuario ${usuario} creado exitosamente! Ya puedes iniciar sesión.`, 'success');
+
+    // Autocompletar el formulario de inicio de sesión con los datos registrados
+    const txtLoginUser = document.getElementById('txtLoginUsuario');
+    const txtLoginPass = document.getElementById('txtLoginPassword');
+    if (txtLoginUser) txtLoginUser.value = usuario;
+    if (txtLoginPass) txtLoginPass.value = password;
+    if (txtLoginPass) txtLoginPass.focus();
+
+  } catch (err) {
+    console.error('Error al registrar usuario en la API:', err);
+    if (errBox && errText) {
+      errText.textContent = 'Error al registrar el usuario en la API mock. Verifique la conexión.';
+      errBox.classList.remove('hidden');
+    }
+  } finally {
+    if (btnGuardar) {
+      btnGuardar.disabled = false;
+      btnGuardar.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Registrar Usuario`;
+      if (window.lucide) lucide.createIcons();
+    }
+  }
+}
 
 function cerrarSesion() {
   currentUser = null;
@@ -1511,6 +1737,9 @@ function simulateReload() {
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
+  // Precargar usuarios registrados en la API mock (/usuarios)
+  cargarUsuariosRemotos();
+
   // Listener del formulario de Login
   const formLogin = document.getElementById('formLogin');
   if (formLogin) {
@@ -1520,6 +1749,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const password = document.getElementById('txtLoginPassword').value;
       iniciarSesion(usuario, password);
     };
+  }
+
+  // Listener para el formulario del modal de registro de nuevo usuario
+  const formReg = document.getElementById('formRegistroUsuario');
+  if (formReg) {
+    formReg.onsubmit = guardarNuevoUsuario;
+  }
+
+  // Cerrar modal de registro al hacer clic en el backdrop
+  const modalRegistro = document.getElementById('modalRegistroUsuario');
+  if (modalRegistro) {
+    modalRegistro.addEventListener('click', (e) => {
+      if (e.target === modalRegistro) cerrarModalRegistroUsuario();
+    });
   }
 
   // Listener para el formulario del modal de nuevo pasajero
@@ -1540,6 +1783,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       cerrarModalPasajero();
+      cerrarModalRegistroUsuario();
       toggleSidebar(false);
     }
   });
