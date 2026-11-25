@@ -116,13 +116,17 @@ async function cargarUsuariosRemotos() {
         const uNorm = normalizarPerfilUsuario(u);
         const idx = USUARIOS_SISTEMA.findIndex(local =>
           local.id === uNorm.id ||
-          local.usuario === uNorm.usuario ||
-          (local.email && uNorm.email && local.email === uNorm.email)
+          (local.usuario && uNorm.usuario && local.usuario.toLowerCase() === uNorm.usuario.toLowerCase()) ||
+          (local.email && uNorm.email && local.email.toLowerCase() === uNorm.email.toLowerCase())
         );
         if (idx === -1) {
           USUARIOS_SISTEMA.push(uNorm);
-        } else if (u.password) {
-          USUARIOS_SISTEMA[idx].password = u.password;
+        } else {
+          USUARIOS_SISTEMA[idx] = {
+            ...USUARIOS_SISTEMA[idx],
+            ...uNorm,
+            password: u.password || USUARIOS_SISTEMA[idx].password || '123456'
+          };
         }
       });
     }
@@ -226,51 +230,92 @@ async function iniciarSesion(identificador, password) {
   const limpio = (identificador || '').trim().toLowerCase();
   const passLimpio = (password || '').trim();
 
-  // 1. Buscar en memoria local
-  let user = USUARIOS_SISTEMA.find(u => {
-    const coincide = u.usuario === limpio || u.email.toLowerCase() === limpio;
-    if (!coincide) return false;
-    return passLimpio === u.password || passLimpio === '123456' || passLimpio === `${u.usuario}123` || passLimpio === u.usuario;
-  });
-
-  // 2. Si no se encuentra en memoria, consultar la API mock
-  if (!user) {
-    try {
-      const [porEmail, porUser] = await Promise.all([
-        ApiService.get(`usuarios?email=${encodeURIComponent(limpio)}`),
-        ApiService.get(`usuarios?usuario=${encodeURIComponent(limpio)}`)
-      ]);
-      let candidato = (Array.isArray(porEmail) && porEmail.length > 0) ? porEmail[0] : null;
-      if (!candidato && Array.isArray(porUser) && porUser.length > 0) {
-        candidato = porUser[0];
-      }
-      if (candidato) {
-        const passValido = !candidato.password ||
-                           candidato.password === passLimpio ||
-                           passLimpio === '123456' ||
-                           passLimpio === `${candidato.usuario}123` ||
-                           passLimpio === candidato.usuario;
-        if (passValido) {
-          user = normalizarPerfilUsuario(candidato);
-          USUARIOS_SISTEMA.push(user);
-        }
-      }
-    } catch (_) { /* continuar con error de autenticación */ }
-  }
-
   const loginError = document.getElementById('loginError');
   const loginErrorText = document.getElementById('loginErrorText');
+  const btnLogin = document.getElementById('btnLogin');
 
-  if (!user) {
+  if (!limpio || !passLimpio) {
     if (loginError) loginError.classList.remove('hidden');
-    if (loginErrorText) loginErrorText.textContent = 'Usuario o contraseña incorrectos.';
+    if (loginErrorText) loginErrorText.textContent = 'Por favor complete todos los campos para iniciar sesión.';
     return false;
   }
 
-  if (loginError) loginError.classList.add('hidden');
-  mostrarApp(user);
-  showToast(`Bienvenido, ${user.nombres} (${user.rolLabel})`, 'success');
-  return true;
+  if (btnLogin) {
+    btnLogin.disabled = true;
+    btnLogin.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Validando...`;
+    if (window.lucide) lucide.createIcons();
+  }
+
+  try {
+    // 1. Sincronizar siempre con la API mock (${API_BASE_URL}/usuarios) para tener la lista de usuarios más reciente
+    let remotos = [];
+    try {
+      const dataApi = await ApiService.get('usuarios');
+      if (Array.isArray(dataApi)) {
+        remotos = dataApi;
+        remotos.forEach(u => {
+          const uNorm = normalizarPerfilUsuario(u);
+          const idx = USUARIOS_SISTEMA.findIndex(local =>
+            local.id === uNorm.id ||
+            (local.usuario && uNorm.usuario && local.usuario.toLowerCase() === uNorm.usuario.toLowerCase()) ||
+            (local.email && uNorm.email && local.email.toLowerCase() === uNorm.email.toLowerCase())
+          );
+          if (idx === -1) {
+            USUARIOS_SISTEMA.push(uNorm);
+          } else {
+            USUARIOS_SISTEMA[idx] = {
+              ...USUARIOS_SISTEMA[idx],
+              ...uNorm,
+              password: u.password || USUARIOS_SISTEMA[idx].password || '123456'
+            };
+          }
+        });
+      }
+    } catch (_) {
+      /* si la API no está disponible en este momento, continúa con USUARIOS_SISTEMA */
+    }
+
+    // 2. Buscar candidato coincidente de forma exacta e insensible a mayúsculas/minúsculas
+    // Priorizamos los datos directos obtenidos de la API y luego los registrados en memoria
+    const listaCombinada = [
+      ...remotos.map(normalizarPerfilUsuario),
+      ...USUARIOS_SISTEMA
+    ];
+
+    const usuarioEncontrado = listaCombinada.find(u => {
+      const uUser = (u.usuario || (u.email ? u.email.split('@')[0] : '')).trim().toLowerCase();
+      const uEmail = (u.email || '').trim().toLowerCase();
+      return (uUser && uUser === limpio) || (uEmail && uEmail === limpio);
+    });
+
+    // 3. Si no existe ningún usuario que coincida exactamente con el usuario o correo
+    if (!usuarioEncontrado) {
+      if (loginError) loginError.classList.remove('hidden');
+      if (loginErrorText) loginErrorText.textContent = 'Usuario o correo no registrado.';
+      return false;
+    }
+
+    // 4. Verificación estricta de contraseña
+    const passwordEsperada = (usuarioEncontrado.password || '123456').trim();
+    if (passLimpio !== passwordEsperada) {
+      if (loginError) loginError.classList.remove('hidden');
+      if (loginErrorText) loginErrorText.textContent = 'Contraseña incorrecta. Por favor verifique sus datos.';
+      return false;
+    }
+
+    // 5. Iniciar sesión exclusivamente con el usuario coincidente y su rol real
+    if (loginError) loginError.classList.add('hidden');
+    mostrarApp(usuarioEncontrado);
+    showToast(`Bienvenido, ${usuarioEncontrado.nombres} (${usuarioEncontrado.rolLabel})`, 'success');
+    return true;
+
+  } finally {
+    if (btnLogin) {
+      btnLogin.disabled = false;
+      btnLogin.innerHTML = `<i data-lucide="log-in" class="w-5 h-5"></i> Iniciar sesión`;
+      if (window.lucide) lucide.createIcons();
+    }
+  }
 }
 
 function abrirModalRegistroUsuario() {
@@ -1980,11 +2025,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Verificar sesión guardada en localStorage
-  const sesionGuardada = obtenerSesionGuardada();
-  if (sesionGuardada) {
-    mostrarApp(sesionGuardada);
-  } else {
-    mostrarLogin();
-  }
+  // Precargar usuarios registrados en la API mock y verificar sesión
+  cargarUsuariosRemotos().finally(() => {
+    const sesionGuardada = obtenerSesionGuardada();
+    if (sesionGuardada) {
+      mostrarApp(sesionGuardada);
+    } else {
+      mostrarLogin();
+    }
+  });
 });
