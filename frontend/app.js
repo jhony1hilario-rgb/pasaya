@@ -181,6 +181,18 @@ function aplicarPermisosMenu() {
   }
   if (topbarLabel) topbarLabel.textContent = `${currentUser.nombres} (${currentUser.rolLabel})`;
 
+  // Control de visibilidad del botón restringido para crear administradores (solo admin)
+  const btnAdminCrear = document.getElementById('btnAdminCrearUsuario');
+  if (btnAdminCrear) {
+    if (currentUser.rol === 'administrador') {
+      btnAdminCrear.classList.remove('hidden');
+      btnAdminCrear.classList.add('flex');
+    } else {
+      btnAdminCrear.classList.add('hidden');
+      btnAdminCrear.classList.remove('flex');
+    }
+  }
+
   document.querySelectorAll('#navMenu .nav-item[data-view]').forEach(btn => {
     const vista = btn.getAttribute('data-view');
     const permitido = currentUser.allowedViews.includes(vista) ||
@@ -304,6 +316,15 @@ async function guardarNuevoUsuario(e) {
     return;
   }
 
+  // Validación estricta de seguridad: el registro público solo permite pasajero o conductor
+  if (rol !== 'pasajero' && rol !== 'conductor') {
+    if (errBox && errText) {
+      errText.textContent = 'Por motivos de seguridad, el registro público solo permite cuentas con rol Pasajero o Conductor.';
+      errBox.classList.remove('hidden');
+    }
+    return;
+  }
+
   if (password.length < 4) {
     if (errBox && errText) {
       errText.textContent = 'La contraseña debe tener al menos 4 caracteres.';
@@ -403,6 +424,164 @@ async function guardarNuevoUsuario(e) {
     if (btnGuardar) {
       btnGuardar.disabled = false;
       btnGuardar.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Registrar Usuario`;
+      if (window.lucide) lucide.createIcons();
+    }
+  }
+}
+
+// ------------------------------------------------------------------------------
+// Gestión Restringida de Administradores (Solo accesible por sesión de Administrador)
+// ------------------------------------------------------------------------------
+function abrirModalRegistroAdmin() {
+  if (!currentUser || currentUser.rol !== 'administrador') {
+    showToast('Acceso restringido: Solo un Administrador autenticado puede crear otros administradores.', 'error');
+    return;
+  }
+  const modal = document.getElementById('modalRegistroAdmin');
+  if (!modal) return;
+  const form = document.getElementById('formRegistroAdmin');
+  if (form) form.reset();
+  const errBox = document.getElementById('registroAdminError');
+  if (errBox) errBox.classList.add('hidden');
+  modal.classList.remove('hidden');
+  const txtNombres = document.getElementById('txtAdminNombres');
+  if (txtNombres) txtNombres.focus();
+  if (window.lucide) lucide.createIcons();
+}
+
+function cerrarModalRegistroAdmin() {
+  const modal = document.getElementById('modalRegistroAdmin');
+  if (modal) modal.classList.add('hidden');
+}
+
+async function guardarNuevoAdmin(e) {
+  if (e) e.preventDefault();
+
+  // Verificación estricta de privilegios de Administrador
+  if (!currentUser || currentUser.rol !== 'administrador') {
+    showToast('Acceso denegado: Se requieren privilegios de Administrador.', 'error');
+    cerrarModalRegistroAdmin();
+    return;
+  }
+
+  const nombres = document.getElementById('txtAdminNombres').value.trim();
+  const usuario = document.getElementById('txtAdminUsuario').value.trim().toLowerCase();
+  const email = document.getElementById('txtAdminEmail').value.trim().toLowerCase();
+  const password = document.getElementById('txtAdminPassword').value.trim();
+  const btnGuardar = document.getElementById('btnGuardarAdmin');
+  const errBox = document.getElementById('registroAdminError');
+  const errText = document.getElementById('registroAdminErrorText');
+
+  if (!nombres || !usuario || !email || !password) {
+    if (errBox && errText) {
+      errText.textContent = 'Por favor complete todos los campos obligatorios.';
+      errBox.classList.remove('hidden');
+    }
+    return;
+  }
+
+  if (password.length < 6) {
+    if (errBox && errText) {
+      errText.textContent = 'La contraseña para cuentas de Administrador debe tener al menos 6 caracteres.';
+      errBox.classList.remove('hidden');
+    }
+    return;
+  }
+
+  // Verificar si ya existe en memoria local
+  const yaExisteLocal = USUARIOS_SISTEMA.some(u => u.usuario === usuario || u.email === email);
+  if (yaExisteLocal) {
+    if (errBox && errText) {
+      errText.textContent = `El usuario "${usuario}" o el correo "${email}" ya se encuentra registrado.`;
+      errBox.classList.remove('hidden');
+    }
+    return;
+  }
+
+  if (btnGuardar) {
+    btnGuardar.disabled = true;
+    btnGuardar.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Registrando...`;
+    if (window.lucide) lucide.createIcons();
+  }
+
+  try {
+    // Validar duplicidad en la API mock (/usuarios)
+    try {
+      const [porEmail, porUser] = await Promise.all([
+        ApiService.get(`usuarios?email=${encodeURIComponent(email)}`),
+        ApiService.get(`usuarios?usuario=${encodeURIComponent(usuario)}`)
+      ]);
+      if ((Array.isArray(porEmail) && porEmail.length > 0) || (Array.isArray(porUser) && porUser.length > 0)) {
+        if (errBox && errText) {
+          errText.textContent = `El usuario o correo ya está registrado en el servidor.`;
+          errBox.classList.remove('hidden');
+        }
+        if (btnGuardar) {
+          btnGuardar.disabled = false;
+          btnGuardar.innerHTML = `<i data-lucide="shield-check" class="w-4 h-4"></i> Crear Administrador`;
+          if (window.lucide) lucide.createIcons();
+        }
+        return;
+      }
+    } catch (_) { /* continuar con creación */ }
+
+    // Payload para json-server (/usuarios) asignando rol administrador
+    const nuevoId = `usr-admin-${Date.now()}`;
+    const payloadUsuario = {
+      id: nuevoId,
+      usuario,
+      nombres,
+      email,
+      password,
+      rol: 'administrador',
+      estado: 'activo',
+      fecha_creacion: new Date().toISOString()
+    };
+
+    // Guardar en la API mock
+    await ApiService.post('usuarios', payloadUsuario);
+
+    // Integrar a la lista de perfiles en memoria
+    const perfilNormalizado = normalizarPerfilUsuario(payloadUsuario);
+    USUARIOS_SISTEMA.push(perfilNormalizado);
+
+    // Registrar evento de seguridad en la bitácora de auditoría (RNF-SEG-04)
+    try {
+      await ApiService.post('auditoria', {
+        id: `aud-${Date.now()}`,
+        usuario_id: currentUser.id,
+        accion: 'CREAR_ADMINISTRADOR',
+        entidad: 'usuario',
+        entidad_id: nuevoId,
+        detalles: {
+          nuevo_admin: usuario,
+          email,
+          nombres,
+          creado_por: currentUser.usuario
+        },
+        ip_origen: '127.0.0.1',
+        fecha_hora: new Date().toISOString()
+      });
+    } catch (_) { /* auditoría no crítica */ }
+
+    cerrarModalRegistroAdmin();
+    showToast(`¡Administrador ${usuario} registrado exitosamente con acceso total!`, 'success');
+
+    // Si se encuentra en la vista de auditoría, recargar para ver el evento de creación
+    if (currentView === 'auditoria') {
+      await navigate('auditoria');
+    }
+
+  } catch (err) {
+    console.error('Error al registrar administrador en la API:', err);
+    if (errBox && errText) {
+      errText.textContent = 'Error al registrar el administrador en la API mock. Verifique la conexión.';
+      errBox.classList.remove('hidden');
+    }
+  } finally {
+    if (btnGuardar) {
+      btnGuardar.disabled = false;
+      btnGuardar.innerHTML = `<i data-lucide="shield-check" class="w-4 h-4"></i> Crear Administrador`;
       if (window.lucide) lucide.createIcons();
     }
   }
@@ -1118,11 +1297,14 @@ const Views = {
       const auditoria = await ApiService.get('auditoria');
       return `
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-6">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6 pb-4 border-b border-slate-100">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-100">
             <div>
               <h3 class="font-bold text-base sm:text-lg text-slate-800">8. Bitácora de Eventos de Auditoría (RNF-SEG-04)</h3>
               <p class="text-xs text-slate-500">Registro inmutable de trazabilidad y seguridad</p>
             </div>
+            <button type="button" onclick="abrirModalRegistroAdmin()" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm self-start sm:self-auto min-h-[38px]">
+              <i data-lucide="shield-plus" class="w-4 h-4"></i> Crear Administrador
+            </button>
           </div>
 
           <div class="overflow-x-auto" style="-webkit-overflow-scrolling: touch;">
@@ -1751,7 +1933,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // Listener para el formulario del modal de registro de nuevo usuario
+  // Listener para el formulario del modal de registro de nuevo usuario (público)
   const formReg = document.getElementById('formRegistroUsuario');
   if (formReg) {
     formReg.onsubmit = guardarNuevoUsuario;
@@ -1762,6 +1944,20 @@ document.addEventListener('DOMContentLoaded', () => {
   if (modalRegistro) {
     modalRegistro.addEventListener('click', (e) => {
       if (e.target === modalRegistro) cerrarModalRegistroUsuario();
+    });
+  }
+
+  // Listener para el formulario del modal de registro de administrador (restringido)
+  const formRegAdmin = document.getElementById('formRegistroAdmin');
+  if (formRegAdmin) {
+    formRegAdmin.onsubmit = guardarNuevoAdmin;
+  }
+
+  // Cerrar modal de administrador al hacer clic en el backdrop
+  const modalRegAdmin = document.getElementById('modalRegistroAdmin');
+  if (modalRegAdmin) {
+    modalRegAdmin.addEventListener('click', (e) => {
+      if (e.target === modalRegAdmin) cerrarModalRegistroAdmin();
     });
   }
 
@@ -1784,6 +1980,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Escape') {
       cerrarModalPasajero();
       cerrarModalRegistroUsuario();
+      cerrarModalRegistroAdmin();
       toggleSidebar(false);
     }
   });
