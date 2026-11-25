@@ -3,13 +3,8 @@
 // Laboratorio 13: Comunicación Frontend-Backend con API Simulada
 // ==============================================================================
 
-// URL Base del servidor de datos
-// Detección automática y flexible de la API (100% relativa / sin rutas absolutas):
-// - Si se ejecuta desde un servidor HTTP local en el puerto 3000, usa el origen relativo actual.
-// - Si se abre directamente como archivo local (file://) o desde otro puerto de desarrollo, apunta a http://localhost:3000
-const API_BASE_URL = (typeof window !== 'undefined' && window.location.protocol.startsWith('http'))
-  ? window.location.origin
-  : 'http://localhost:3000';
+// URL Base del servidor de datos construida dinámicamente apuntando siempre al puerto 3000
+const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:3000`;
 
 const AUTH_STORAGE_KEY = 'pasaya_auth_session';
 
